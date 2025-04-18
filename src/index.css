@@ -1,5 +1,5 @@
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* Tailwind directives */
 @tailwind base;
@@ -8,19 +8,21 @@
 
 /* Custom styles */
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 .font-academy {
-  font-family: 'Academy Engraved LET', 'Palatino Linotype', serif;
+  font-family: "Academy Engraved LET", "Palatino Linotype", serif;
 }
 
 .font-georgia {
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
 }
 
 /* Override default styles */
-button, input, select {
+button,
+input,
+select {
   font-family: inherit;
 }
 
