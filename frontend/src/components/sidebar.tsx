@@ -1,4 +1,5 @@
 import React from "react";
+import { HiChevronLeft } from "react-icons/hi";
 
 interface SidebarProps {
   width: number;
@@ -24,7 +25,6 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
       borderRight: "2px solid #d1d5db", // 更粗灰色边框
       height: "100vh",
       boxSizing: "border-box",
-      // padding: "16px",
     }}
   >
     {/* Logo and hide button */}
@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: "24px",
+        marginBottom: "12px",
         padding: "16px",
       }}
     >
@@ -55,9 +55,9 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
       </div>
       <button
         onClick={onToggle}
-        style={{ padding: "8px", border: "none", background: "none" }}
+        className="pl-3 py-2 bg-transparent border-none hover:opacity-80"
       >
-        ✕
+        <HiChevronLeft size={24} />
       </button>
     </div>
 
@@ -96,14 +96,14 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
     </nav>
 
     {/* New Chat button */}
-    <div style={{ marginTop: "24px", padding: "16px" }}>
+    <div style={{ marginTop: "2px", padding: "16px" }}>
       <button
         style={{
           width: "100%",
           padding: "12px 8px",
           fontSize: "16px",
           backgroundColor: "#f3f4f6", // 灰色背景
-          borderRadius: "6px",
+          // borderRadius: "6px",
           border: "1px solid #d1d5db",
           cursor: "pointer",
         }}
@@ -116,13 +116,6 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
       >
         New Chat
       </button>
-    </div>
-    <div className="p-4 space-y-4">
-    <div className="text-sm bg-gray-100">text-sm</div>
-      <div className="text-lg bg-gray-200">text-lg</div>
-      <div className="text-2xl bg-gray-300">text-2xl</div>
-      <div className="text-4xl bg-gray-400">text-4xl</div>
-      <div className="text-5xl bg-gray-500">text-5xl</div>
     </div>
   </div>
 );
