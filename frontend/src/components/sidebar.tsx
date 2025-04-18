@@ -117,6 +117,13 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
         New Chat
       </button>
     </div>
+    <div className="p-4 space-y-4">
+    <div className="text-sm bg-gray-100">text-sm</div>
+      <div className="text-lg bg-gray-200">text-lg</div>
+      <div className="text-2xl bg-gray-300">text-2xl</div>
+      <div className="text-4xl bg-gray-400">text-4xl</div>
+      <div className="text-5xl bg-gray-500">text-5xl</div>
+    </div>
   </div>
 );
 

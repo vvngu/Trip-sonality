@@ -1,2 +1,19 @@
+# Node
+node_modules/
+*.log
+
+# Vite 构建缓存
+frontend/.vite/
+frontend/dist/
+
+# OS 系统文件
 .DS_Store
-node_modules
+Thumbs.db
+
+# IDE / 编辑器
+.vscode/
+*.swp
+
+# TypeScript 编译输出（如有设置）
+frontend/build/
+*.tsbuildinfo
