@@ -268,7 +268,7 @@ export default function App() {
                   placeholder="Enter your Interests and Dislikes..."
                   value={fieldInput}
                   onChange={(e) => setFieldInput(e.target.value)}
-                  className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm"
+                  className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm font-georgia "
                 />
                 <button
                   onClick={handleSend}
@@ -294,7 +294,7 @@ export default function App() {
               <div className="mt-4 flex items-center justify-between space-x-4">
                 {/* MBTI Select */}
                 <div className="rounded-full border border-gray-300 flex items-center px-3 shadow-sm hover:border-gray-400 transition-colors">
-                  <span className="text-xs text-gray-600 font-medium">
+                  <span className="text-xs text-gray-600 font-medium font-georgia ">
                     MBTI:
                   </span>
                   <Select<OptionType, false>
@@ -335,13 +335,13 @@ export default function App() {
                         zIndex: 9999, // make sure it floats above everything
                       }),
                     }}
-                    className="w-auto text-xs"
+                    className="w-auto text-xs font-georgia "
                   />
                 </div>
 
                 {/* Budget Select */}
                 <div className="rounded-full border border-gray-300 flex items-center px-3 shadow-sm hover:border-gray-400 transition-colors">
-                  <span className="text-xs text-gray-600 font-medium">
+                  <span className="text-xs text-gray-600 font-medium font-georgia ">
                     Budget:
                   </span>
                   <Select<BudgetOption, false>
@@ -385,7 +385,7 @@ export default function App() {
                         zIndex: 9999, // make sure it floats above everything
                       }),
                     }}
-                    className="w-auto text-xs"
+                    className="w-auto text-xs font-georgia "
                   />
                 </div>
               </div>

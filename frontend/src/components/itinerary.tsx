@@ -91,15 +91,17 @@ export default function Itinerary() {
   return (
     <div className="panel rounded-custom flex-1 overflow-auto p-4">
       {/* Header */}
-      <h2 className="text-center font-georgia font-medium text-xl mb-1">
+      <h2 className="text-center font-georgia font-medium text-lg mb-1">
         {placeholderItinerary.length} Days Itinerary – Los Angeles Movie Trip
       </h2>
-      <div className="text-center font-medium mb-4">{day.day}</div>
+      <div className="text-center font-medium mb-4 font-georgia ">
+        {day.day}
+      </div>
 
       {/* Sections */}
       <div className="space-y-4">
         {/* Food */}
-        <div className="border border-gray-200 p-4 rounded-lg">
+        <div className="border border-gray-200 p-4 rounded-lg font-georgia ">
           <div className="font-medium text-lg mb-2">Food</div>
           <div className="flex items-center">
             <div className="w-24 text-sm">{day.food.time}</div>
@@ -109,7 +111,7 @@ export default function Itinerary() {
         </div>
 
         {/* Activities */}
-        <div className="border border-gray-200 p-4 rounded-lg">
+        <div className="border border-gray-200 p-4 rounded-lg font-georgia ">
           <div className="font-medium text-lg mb-2">Activities</div>
           <div className="space-y-2">
             {day.activities.map((act) => (
@@ -123,7 +125,7 @@ export default function Itinerary() {
         </div>
 
         {/* Summary */}
-        <div className="border border-gray-200 p-4 rounded-lg">
+        <div className="border border-gray-200 p-4 rounded-lg font-georgia ">
           <div className="font-medium text-lg mb-2">Summary of the Day</div>
           <p className="text-sm">{day.summary}</p>
         </div>
