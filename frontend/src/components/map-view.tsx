@@ -28,7 +28,6 @@ const itineraryLocations = [
 // declare module '@react-google-maps/api';
 
 export const MapView: React.FC<MapViewProps> = () => {
-
   // Google Maps options
   const mapOptions = useMemo(
     () => ({
@@ -37,19 +36,12 @@ export const MapView: React.FC<MapViewProps> = () => {
       scrollwheel: true,
       styles: [
         {
-          featureType: "water",
-          elementType: "geometry.fill",
-          stylers: [{ color: "#d3edf9" }],
-        },
-        {
-          featureType: "poi",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#6f9ba5" }],
-        },
-        {
-          featureType: "road",
-          elementType: "geometry.fill",
-          stylers: [{ color: "#fffffa" }],
+          // 全局去色处理
+          stylers: [
+            { saturation: -100 }, // 去除饱和度
+            { lightness: 30 }, // 保持亮度不变
+            { gamma: 0.6 },
+          ],
         },
       ],
     }),
@@ -79,7 +71,10 @@ export const MapView: React.FC<MapViewProps> = () => {
     <div className="w-full h-full relative overflow-hidden rounded-lg">
       {/* @ts-ignore */}
       <GoogleMap
-        mapContainerStyle={{ width: "100%", height: "100%" }}
+        mapContainerStyle={{
+          width: "100%",
+          height: "100%",
+        }}
         center={losAngelesCoordinates}
         zoom={12}
         options={mapOptions}
