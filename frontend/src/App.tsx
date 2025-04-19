@@ -8,6 +8,7 @@ import Select, { SingleValue } from "react-select";
 import { FiShare2 } from "react-icons/fi";
 import { FaSignInAlt } from "react-icons/fa";
 import WelcomePage from "./components/WelcomePage";
+import ShareModal from "./components/ShareModal";
 
 //
 // ——— Types ———
@@ -88,6 +89,7 @@ export default function App() {
     return savedState ? JSON.parse(savedState) : true;
   });
   const [highlightedPlace, setHighlightedPlace] = useState<string | undefined>(undefined);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const sidebarDraggingRef = useRef(false);
   const mapPanelDraggingRef = useRef(false);
@@ -174,6 +176,11 @@ export default function App() {
     setShowWelcome(true);
   };
 
+  // Handler for Share button
+  const handleShareClick = () => {
+    setShareModalOpen(true);
+  };
+
   return (
     <div className="flex h-screen relative">
       {/* Sidebar - Always visible regardless of welcome page */}
@@ -200,6 +207,12 @@ export default function App() {
         />
       )}
 
+      {/* Share Modal */}
+      <ShareModal 
+        isOpen={shareModalOpen} 
+        onClose={() => setShareModalOpen(false)} 
+      />
+
       {/* Main Content - Either welcome page or main app */}
       <div
         className="flex-1 flex flex-col font-sans bg-white"
@@ -213,7 +226,10 @@ export default function App() {
           <>
             {/* Top Buttons */}
             <div className="flex justify-end p-3 gap-2">
-              <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
+              <button 
+                onClick={handleShareClick}
+                className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition"
+              >
                 {/* @ts-ignore */}
                 <FiShare2 size={16} />
                 <span>Share</span>
