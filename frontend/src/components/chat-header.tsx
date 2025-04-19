@@ -19,7 +19,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => (
   <div className="grid grid-cols-3 gap-2 mb-4 border border-gray-200 rounded-lg overflow-hidden">
     <div className="p-3 border-r border-gray-200 flex items-center space-x-2">
-      <label className="text-gray-500 text-sm font-georgia whitespace-nowrap">
+      <label className="text-gray-600 text-base font-georgia font-medium whitespace-nowrap">
         Theme:
       </label>
       <input
@@ -31,7 +31,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       />
     </div>
     <div className="p-3 border-r border-gray-200 flex items-center space-x-2">
-      <label className="text-gray-500 text-sm font-georgia whitespace-nowrap">
+      <label className="text-gray-600 text-base font-georgia font-medium whitespace-nowrap">
         Location:
       </label>
       <input
@@ -43,7 +43,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       />
     </div>
     <div className="p-3 flex items-center space-x-2">
-      <label className="text-gray-500 text-sm font-georgia whitespace-nowrap">
+      <label className="text-gray-600 text-base font-georgia font-medium whitespace-nowrap">
         Length:
       </label>
       <input

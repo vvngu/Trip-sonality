@@ -271,8 +271,8 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
 
         {/* Summary */}
         <div className="border border-gray-200 p-4 rounded-lg font-georgia ">
-          <div className="font-medium text-lg mb-2">Summary of the Day</div>
-          <p className="text-sm">{day.summary}</p>
+          <div className="font-medium text-lg mb-2 text-red-800">Summary of the Day</div>
+          <p className="text-sm italic text-gray-700">"{day.summary}"</p>
         </div>
       </div>
 
