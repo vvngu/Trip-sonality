@@ -36,3 +36,26 @@ select {
   padding: 1rem;
   background-color: white;
 }
+
+/* Swipe animations */
+@keyframes slideLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(-50px); opacity: 0; }
+  51% { transform: translateX(50px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideRight {
+  0% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(50px); opacity: 0; }
+  51% { transform: translateX(-50px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-left {
+  animation: slideLeft 0.3s ease-in-out;
+}
+
+.animate-slide-right {
+  animation: slideRight 0.3s ease-in-out;
+}
