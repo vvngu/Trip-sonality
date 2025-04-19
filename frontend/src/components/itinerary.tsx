@@ -99,16 +99,26 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState<'none' | 'left' | 'right'>('none');
   const [touchStartX, setTouchStartX] = useState(0);
+  const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
 
   // Function to handle mouse enter on place names
   const handlePlaceHover = (place: string) => {
+    setActivePlace(place);
     onPlaceHover(place);
   };
 
-  // Function to handle mouse leave
+  // We're intentionally not clearing the hover state when mouse leaves
+  // This keeps the marker visible until another place is hovered
   const handlePlaceLeave = () => {
-    onPlaceHover(undefined);
+    // We no longer clear the highlighted place
+    // onPlaceHover(undefined);
   };
+
+  // Clear highlighted place when changing days
+  useEffect(() => {
+    setActivePlace(undefined);
+    onPlaceHover(undefined);
+  }, [currentIndex, onPlaceHover]);
 
   // Move to next or previous day
   const moveToPrev = () => {
@@ -239,7 +249,9 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
           <div className="flex items-center">
             <div className="w-24 text-sm text-gray-500">{day.food.time}</div>
             <div 
-              className="flex-1 text-sm font-medium text-gray-900 hover:text-red-500 cursor-pointer transition-colors"
+              className={`flex-1 text-sm font-medium cursor-pointer transition-colors ${
+                activePlace === day.food.place ? 'text-red-500' : 'text-gray-900 hover:text-red-500'
+              }`}
               onMouseEnter={() => handlePlaceHover(day.food.place)}
               onMouseLeave={handlePlaceLeave}
             >
@@ -257,7 +269,9 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
               <div key={act.place} className="flex items-center">
                 <div className="w-24 text-sm text-gray-500">{act.time}</div>
                 <div 
-                  className="flex-1 text-sm font-medium text-gray-900 hover:text-red-500 cursor-pointer transition-colors"
+                  className={`flex-1 text-sm font-medium cursor-pointer transition-colors ${
+                    activePlace === act.place ? 'text-red-500' : 'text-gray-900 hover:text-red-500'
+                  }`}
                   onMouseEnter={() => handlePlaceHover(act.place)}
                   onMouseLeave={handlePlaceLeave}
                 >
