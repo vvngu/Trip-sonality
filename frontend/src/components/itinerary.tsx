@@ -222,8 +222,13 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
         {placeholderItinerary.length} Days Itinerary – Los Angeles Movie Trip
       </h2>
       <div className="border-b border-gray-200 w-3/4 mx-auto mb-3"></div>
-      <div className="text-center font-medium mb-4 font-georgia">
-        {day.day}
+      <div className="flex justify-center mb-4">
+        <div className="relative">
+          <div className="absolute inset-0 translate-x-2 translate-y-2 bg-gray-200 rounded-md"></div>
+          <div className="relative py-1 px-6 border-2 border-black bg-white rounded-md font-georgia font-medium z-10">
+            {day.day}
+          </div>
+        </div>
       </div>
 
       {/* Sections */}

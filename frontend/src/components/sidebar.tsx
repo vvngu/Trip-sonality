@@ -4,6 +4,7 @@ import { HiChevronLeft } from "react-icons/hi";
 interface SidebarProps {
   width: number;
   onToggle: () => void;
+  onNewChat: () => void;
 }
 
 const menuItems = [
@@ -15,7 +16,7 @@ const menuItems = [
   "Create",
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
+const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
   <div
     style={{
       width,
@@ -98,6 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle }) => (
     {/* New Chat button */}
     <div style={{ marginTop: "2px", padding: "16px" }}>
       <button
+        onClick={onNewChat}
         style={{
           width: "100%",
           padding: "12px 8px",
