@@ -3,7 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "./components/sidebar";
 import { MapView } from "./components/map-view";
 import { ChatHeader } from "./components/chat-header";
+import Itinerary from "./components/itinerary";
 import Select, { SingleValue } from "react-select";
+import { FiShare2 } from "react-icons/fi";
+import { FaSignInAlt } from "react-icons/fa";
 
 //
 // ——— Types ———
@@ -184,14 +187,16 @@ export default function App() {
       >
         {/* Top Buttons */}
         <div className="flex justify-end p-3 gap-2">
-          <button className="px-6 py-2 border border-gray-200 rounded-full text-lg">
-            Button 1
+          <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
+            <FiShare2 size={16} />
+            <span>Share</span>
           </button>
-          <button className="px-6 py-2 border border-gray-200 rounded-full text-lg">
-            Button 2
+
+          <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
+            <FaSignInAlt size={16} />
+            <span>Sign In</span>
           </button>
         </div>
-
         {/* Content */}
         <div className="flex-1 p-4 flex gap-4">
           {/* Left Panel */}
@@ -207,7 +212,7 @@ export default function App() {
               onLocationChange={setLocationInput}
               onDatesChange={setDatesInput}
             />
-            <div className="panel rounded-custom overflow-hidden flex-1 mt-4">
+            <div className="panel rounded-custom overflow-hidden flex-1 mt-1">
               <MapView />
             </div>
           </div>
@@ -224,7 +229,7 @@ export default function App() {
           {/* Right Panel */}
           <div className="flex flex-col gap-4 flex-1">
             {/* Itinerary */}
-            <div className="panel rounded-custom flex-1 overflow-auto">
+            {/* <div className="panel rounded-custom flex-1 overflow-auto">
               <h2 className="text-center font-georgia font-medium text-xl mb-4">
                 6 Days Itinerary
               </h2>
@@ -252,7 +257,8 @@ export default function App() {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
+            <Itinerary />
 
             {/* Input Section */}
             <div className="panel rounded-custom">
