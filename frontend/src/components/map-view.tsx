@@ -113,6 +113,14 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
       scrollwheel: true,
       styles: [
         {
+          // 全局去色处理
+          stylers: [
+            { saturation: -100 },  // 去除饱和度
+            { lightness: 0 },      // 保持亮度不变
+          ],
+        },
+  
+        {
           featureType: "water",
           elementType: "geometry.fill",
           stylers: [{ color: "#d3edf9" }],
