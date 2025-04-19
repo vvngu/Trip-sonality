@@ -84,9 +84,23 @@ const placeholderItinerary = [
   },
 ];
 
-export default function Itinerary() {
+interface ItineraryProps {
+  onPlaceHover: (place: string | undefined) => void;
+}
+
+export default function Itinerary({ onPlaceHover }: ItineraryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const day = placeholderItinerary[currentIndex];
+
+  // Function to handle mouse enter on place names
+  const handlePlaceHover = (place: string) => {
+    onPlaceHover(place);
+  };
+
+  // Function to handle mouse leave
+  const handlePlaceLeave = () => {
+    onPlaceHover(undefined);
+  };
 
   return (
     <div className="panel rounded-custom flex-1 overflow-auto p-4">
@@ -94,6 +108,7 @@ export default function Itinerary() {
       <h2 className="text-center font-georgia font-medium text-lg mb-1">
         {placeholderItinerary.length} Days Itinerary – Los Angeles Movie Trip
       </h2>
+      <div className="border-b border-gray-200 w-3/4 mx-auto mb-3"></div>
       <div className="text-center font-medium mb-4 font-georgia ">
         {day.day}
       </div>
@@ -105,7 +120,13 @@ export default function Itinerary() {
           <div className="font-medium text-lg mb-2">Food</div>
           <div className="flex items-center">
             <div className="w-24 text-sm">{day.food.time}</div>
-            <div className="flex-1 text-sm">{day.food.place}</div>
+            <div 
+              className="flex-1 text-sm hover:text-red-500 cursor-pointer transition-colors"
+              onMouseEnter={() => handlePlaceHover(day.food.place)}
+              onMouseLeave={handlePlaceLeave}
+            >
+              {day.food.place}
+            </div>
             <div className="w-5 text-sm text-right">{day.food.cost}</div>
           </div>
         </div>
@@ -117,7 +138,13 @@ export default function Itinerary() {
             {day.activities.map((act) => (
               <div key={act.place} className="flex items-center">
                 <div className="w-24 text-sm">{act.time}</div>
-                <div className="flex-1 text-sm">{act.place}</div>
+                <div 
+                  className="flex-1 text-sm hover:text-red-500 cursor-pointer transition-colors"
+                  onMouseEnter={() => handlePlaceHover(act.place)}
+                  onMouseLeave={handlePlaceLeave}
+                >
+                  {act.place}
+                </div>
                 <div className="w-5 text-sm text-right">{act.cost}</div>
               </div>
             ))}

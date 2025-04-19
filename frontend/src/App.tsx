@@ -82,6 +82,7 @@ export default function App() {
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const [mapPanelWidth, setMapPanelWidth] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [highlightedPlace, setHighlightedPlace] = useState<string | undefined>(undefined);
 
   const sidebarDraggingRef = useRef(false);
   const mapPanelDraggingRef = useRef(false);
@@ -213,7 +214,7 @@ export default function App() {
               onDatesChange={setDatesInput}
             />
             <div className="panel rounded-custom overflow-hidden flex-1 mt-1">
-              <MapView />
+              <MapView highlightedPlace={highlightedPlace} />
             </div>
           </div>
 
@@ -258,7 +259,7 @@ export default function App() {
                 </div>
               </div>
             </div> */}
-            <Itinerary />
+            <Itinerary onPlaceHover={setHighlightedPlace} />
 
             {/* Input Section */}
             <div className="panel rounded-custom">
