@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // 6-day placeholder itinerary for a Los Angeles movie-themed trip
 const placeholderItinerary = [
@@ -91,6 +91,14 @@ interface ItineraryProps {
 export default function Itinerary({ onPlaceHover }: ItineraryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const day = placeholderItinerary[currentIndex];
+  
+  // Track mouse movement for swiping
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [offsetX, setOffsetX] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [direction, setDirection] = useState<'none' | 'left' | 'right'>('none');
+  const [touchStartX, setTouchStartX] = useState(0);
 
   // Function to handle mouse enter on place names
   const handlePlaceHover = (place: string) => {
@@ -102,21 +110,126 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
     onPlaceHover(undefined);
   };
 
+  // Move to next or previous day
+  const moveToPrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setDirection('right');
+    }
+  };
+
+  const moveToNext = () => {
+    if (currentIndex < placeholderItinerary.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setDirection('left');
+    }
+  };
+
+  // Mouse events for swipe
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setOffsetX(0);
+    setDirection('none');
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const currentX = e.clientX;
+    const diff = currentX - startX;
+    setOffsetX(diff);
+    
+    if (diff > 50) {
+      setDirection('right');
+    } else if (diff < -50) {
+      setDirection('left');
+    } else {
+      setDirection('none');
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    if (direction === 'left') {
+      moveToNext();
+    } else if (direction === 'right') {
+      moveToPrev();
+    }
+    
+    setIsDragging(false);
+    setOffsetX(0);
+  };
+
+  // Touch events for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setDirection('none');
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchCurrentX = e.touches[0].clientX;
+    const diff = touchCurrentX - touchStartX;
+    
+    if (diff > 50) {
+      setDirection('right');
+    } else if (diff < -50) {
+      setDirection('left');
+    } else {
+      setDirection('none');
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (direction === 'left') {
+      moveToNext();
+    } else if (direction === 'right') {
+      moveToPrev();
+    }
+  };
+
+  // Reset animation classes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDirection('none');
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [currentIndex]);
+
+  // Get animation class
+  const getAnimationClass = () => {
+    if (direction === 'left') return 'animate-slide-left';
+    if (direction === 'right') return 'animate-slide-right';
+    return '';
+  };
+
   return (
-    <div className="panel rounded-custom flex-1 overflow-auto p-4">
+    <div 
+      className="panel rounded-custom flex-1 overflow-hidden p-4"
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+    >
       {/* Header */}
       <h2 className="text-center font-georgia font-medium text-lg mb-1">
         {placeholderItinerary.length} Days Itinerary – Los Angeles Movie Trip
       </h2>
       <div className="border-b border-gray-200 w-3/4 mx-auto mb-3"></div>
-      <div className="text-center font-medium mb-4 font-georgia ">
+      <div className="text-center font-medium mb-4 font-georgia">
         {day.day}
       </div>
 
       {/* Sections */}
-      <div className="space-y-4">
+      <div className={`space-y-4 transition-transform duration-300 ${getAnimationClass()}`}>
         {/* Food */}
-        <div className="border border-gray-200 p-4 rounded-lg font-georgia ">
+        <div className="border border-gray-200 p-4 rounded-lg font-georgia">
           <div className="font-medium text-lg mb-2">Food</div>
           <div className="flex items-center">
             <div className="w-24 text-sm">{day.food.time}</div>
@@ -158,8 +271,14 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-6">
+      {/* Pagination with left/right indicators */}
+      <div className="flex justify-center items-center mt-6 select-none">
+        <div 
+          className={`mr-4 ${currentIndex === 0 ? 'text-gray-300' : 'text-gray-600 cursor-pointer'}`}
+          onClick={currentIndex > 0 ? moveToPrev : undefined}
+        >
+          ←
+        </div>
         {placeholderItinerary.map((_, idx) => (
           <span
             key={idx}
@@ -169,6 +288,12 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
             onClick={() => setCurrentIndex(idx)}
           />
         ))}
+        <div 
+          className={`ml-4 ${currentIndex === placeholderItinerary.length - 1 ? 'text-gray-300' : 'text-gray-600 cursor-pointer'}`}
+          onClick={currentIndex < placeholderItinerary.length - 1 ? moveToNext : undefined}
+        >
+          →
+        </div>
       </div>
     </div>
   );
