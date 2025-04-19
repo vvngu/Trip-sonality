@@ -70,8 +70,12 @@ const budgetOptionsSelect: BudgetOption[] = [
 // ——— App Component ———
 //
 export default function App() {
+  const [themeInput, setThemeInput] = useState<string>("Movie");
+  const [locationInput, setLocationInput] = useState<string>("Los Angeles, CA");
+  const [datesInput, setDatesInput] = useState<string>("6 days");
   const [mbti, setMbti] = useState<MBTI>("INFJ");
   const [budget, setBudget] = useState<string>("1500 USD");
+  const [fieldInput, setFieldInput] = useState<string>("");
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const [mapPanelWidth, setMapPanelWidth] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -131,6 +135,26 @@ export default function App() {
     if (opt) setBudget(opt.value);
   };
 
+  const handleSend = () => {
+    const payload = {
+      theme: themeInput,
+      location: locationInput,
+      dates: datesInput,
+      field: fieldInput,
+      mbti,
+      budget,
+    };
+    // fetch("/api/trip", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(payload),
+    // })
+    //   .then((res) => res.json())
+    //   .then((data) => console.log("Response:", data))
+    //   .catch((err) => console.error(err));
+    console.log("Payload to send:", payload);
+  };
+
   return (
     <div className="flex h-screen relative">
       {/* Sidebar & Toggle */}
@@ -176,9 +200,12 @@ export default function App() {
             style={{ flex: mapPanelWidth ? `0 0 ${mapPanelWidth}px` : "1" }}
           >
             <ChatHeader
-              theme="INFJ Movie Trip"
-              location="Los Angeles, CA, U.S."
-              dates="05.20.2025 - 05.26.2025"
+              theme={themeInput}
+              location={locationInput}
+              dates={datesInput}
+              onThemeChange={setThemeInput}
+              onLocationChange={setLocationInput}
+              onDatesChange={setDatesInput}
             />
             <div className="panel rounded-custom overflow-hidden flex-1 mt-4">
               <MapView />
@@ -232,10 +259,15 @@ export default function App() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter your Destination, Interests and Dislikes..."
+                  placeholder="Enter your Interests and Dislikes..."
+                  value={fieldInput}
+                  onChange={(e) => setFieldInput(e.target.value)}
                   className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm"
                 />
-                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <button
+                  onClick={handleSend}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
                   {/* paper-plane arrow SVG */}
                   <svg
                     width="24"
