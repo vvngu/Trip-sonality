@@ -224,22 +224,25 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* Top Buttons */}
-            <div className="flex justify-end p-3 gap-2">
-              <button 
-                onClick={handleShareClick}
-                className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition"
-              >
-                {/* @ts-ignore */}
-                <FiShare2 size={16} />
-                <span>Share</span>
-              </button>
+            {/* Top Buttons with Divider */}
+            <div className="flex flex-col">
+              <div className="flex justify-end p-3 gap-2">
+                <button 
+                  onClick={handleShareClick}
+                  className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition"
+                >
+                  {/* @ts-ignore */}
+                  <FiShare2 size={16} />
+                  <span>Share</span>
+                </button>
 
-              <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
-                {/* @ts-ignore */}
-                <FaSignInAlt size={16} />
-                <span>Sign In</span>
-              </button>
+                <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
+                  {/* @ts-ignore */}
+                  <FaSignInAlt size={16} />
+                  <span>Sign In</span>
+                </button>
+              </div>
+              <div className="border-b border-gray-200 mx-4 mb-1"></div>
             </div>
             
             {/* Content */}

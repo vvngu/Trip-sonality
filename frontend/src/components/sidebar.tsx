@@ -26,6 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
       borderRight: "2px solid #d1d5db", // 更粗灰色边框
       height: "100vh",
       boxSizing: "border-box",
+      fontFamily: "Georgia, serif",
     }}
   >
     {/* Logo and hide button */}
@@ -46,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
         />
         <span
           style={{
-            fontFamily: "serif",
+            fontFamily: "Georgia, serif",
             fontWeight: "bold",
             fontSize: "18px",
           }}
@@ -75,6 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
         <button
           key={item}
           style={{
+            fontFamily: "Georgia, serif",
             fontSize: "16px",
             padding: "12px 8px",
             width: "100%",
@@ -101,6 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
       <button
         onClick={onNewChat}
         style={{
+          fontFamily: "Georgia, serif",
           width: "100%",
           padding: "12px 8px",
           fontSize: "16px",
