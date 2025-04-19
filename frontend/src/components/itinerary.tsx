@@ -237,15 +237,15 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
         <div className="border border-gray-200 p-4 rounded-lg font-georgia">
           <div className="font-medium text-lg mb-2">Food</div>
           <div className="flex items-center">
-            <div className="w-24 text-sm">{day.food.time}</div>
+            <div className="w-24 text-sm text-gray-500">{day.food.time}</div>
             <div 
-              className="flex-1 text-sm hover:text-red-500 cursor-pointer transition-colors"
+              className="flex-1 text-sm font-medium text-gray-900 hover:text-red-500 cursor-pointer transition-colors"
               onMouseEnter={() => handlePlaceHover(day.food.place)}
               onMouseLeave={handlePlaceLeave}
             >
               {day.food.place}
             </div>
-            <div className="w-5 text-sm text-right">{day.food.cost}</div>
+            <div className="w-5 text-sm text-right text-gray-400">{day.food.cost}</div>
           </div>
         </div>
 
@@ -255,15 +255,15 @@ export default function Itinerary({ onPlaceHover }: ItineraryProps) {
           <div className="space-y-2">
             {day.activities.map((act) => (
               <div key={act.place} className="flex items-center">
-                <div className="w-24 text-sm">{act.time}</div>
+                <div className="w-24 text-sm text-gray-500">{act.time}</div>
                 <div 
-                  className="flex-1 text-sm hover:text-red-500 cursor-pointer transition-colors"
+                  className="flex-1 text-sm font-medium text-gray-900 hover:text-red-500 cursor-pointer transition-colors"
                   onMouseEnter={() => handlePlaceHover(act.place)}
                   onMouseLeave={handlePlaceLeave}
                 >
                   {act.place}
                 </div>
-                <div className="w-5 text-sm text-right">{act.cost}</div>
+                <div className="w-5 text-sm text-right text-gray-400">{act.cost}</div>
               </div>
             ))}
           </div>

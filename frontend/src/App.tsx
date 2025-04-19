@@ -83,7 +83,10 @@ export default function App() {
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const [mapPanelWidth, setMapPanelWidth] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    const savedState = localStorage.getItem('showWelcome');
+    return savedState ? JSON.parse(savedState) : true;
+  });
   const [highlightedPlace, setHighlightedPlace] = useState<string | undefined>(undefined);
 
   const sidebarDraggingRef = useRef(false);
@@ -160,6 +163,11 @@ export default function App() {
     //   .catch((err) => console.error(err));
     console.log("Payload to send:", payload);
   };
+
+  // Save welcome state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('showWelcome', JSON.stringify(showWelcome));
+  }, [showWelcome]);
 
   // Handler for "New Chat" button in sidebar
   const handleNewChat = () => {
