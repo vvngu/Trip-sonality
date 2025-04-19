@@ -11,5 +11,7 @@
     "typescript": "typescript",
     "javascriptreact": "javascriptreact",
     "typescriptreact": "typescriptreact"
-  }
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.terminal.activateEnvironment": true
 } 
