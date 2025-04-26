@@ -250,17 +250,19 @@ export default function App() {
               <div className="flex justify-end p-3 gap-2">
                 <button 
                   onClick={handleShareClick}
-                  className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition"
+                  className="font-georgia p-2 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition text-xs"
+                  title="Share Itinerary"
                 >
                   {/* @ts-ignore */}
-                  <FiShare2 size={16} />
-                  <span>Share</span>
+                  <FiShare2 size={12} />
                 </button>
 
-                <button className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition">
+                <button 
+                  className="font-georgia p-2 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition text-xs"
+                  title="Sign In to Your Account"
+                >
                   {/* @ts-ignore */}
-                  <FaSignInAlt size={16} />
-                  <span>Sign In</span>
+                  <FaSignInAlt size={12} />
                 </button>
               </div>
               <div className="border-b border-gray-200 mx-4 mb-1"></div>

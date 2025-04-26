@@ -76,16 +76,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onStart }) => {
           We'll craft a journey that's uniquely yours.
         </p>
         
-        {/* Get Started Button */}
-        <button 
-          onClick={handleSubmit}
-          className="px-8 py-4 bg-black text-white rounded-full font-medium flex items-center justify-center mx-auto 
-                    hover:bg-gray-800 transition-colors group text-lg mb-12"
-        >
-          Explore my journey
-          <FiArrowRight size={20} className="ml-3 group-hover:translate-x-1 transition-transform" />
-        </button>
-        
         {/* Example Prompts */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full px-8 mb-12">
           {[
