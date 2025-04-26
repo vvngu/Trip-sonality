@@ -262,6 +262,31 @@ export default function App() {
     });
   };
 
+  // Handle welcome page form submission
+  const handleWelcomeComplete = (data: {
+    prompt: string;
+    mbti: string | null;
+    budget: string | null;
+  }) => {
+    // Set field input from prompt
+    if (data.prompt) {
+      setFieldInput(data.prompt);
+    }
+
+    // Set MBTI if provided
+    if (data.mbti) {
+      setMbti(data.mbti as MBTI);
+    }
+
+    // Set budget if provided
+    if (data.budget) {
+      setBudget(data.budget);
+    }
+
+    // Close welcome screen
+    setShowWelcome(false);
+  };
+
   return (
     <div className="flex h-screen relative">
       {/* Sidebar - Always visible regardless of welcome page */}
@@ -301,7 +326,7 @@ export default function App() {
       >
         {showWelcome ? (
           <div className="flex-1 flex justify-center">
-            <WelcomePage onStart={() => setShowWelcome(false)} />
+            <WelcomePage onStart={handleWelcomeComplete} />
           </div>
         ) : (
           <>
@@ -310,11 +335,11 @@ export default function App() {
               <div className="flex justify-end p-3 gap-2">
                 <button
                   onClick={handleShareClick}
-                  className="font-georgia px-4 py-2 border border-gray-300 rounded-full flex items-center gap-2 text-gray-500 hover:bg-gray-100 transition"
+                  className="font-georgia p-2 border border-gray-300 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition text-xs"
+                  title="Share Itinerary"
                 >
                   {/* @ts-ignore */}
-                  <FiShare2 size={16} />
-                  <span>Share</span>
+                  <FiShare2 size={12} />
                 </button>
 
                 <button
