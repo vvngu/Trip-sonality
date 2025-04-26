@@ -181,6 +181,27 @@ export default function App() {
     setShareModalOpen(true);
   };
 
+  // Handle welcome page form submission
+  const handleWelcomeComplete = (data: { prompt: string; mbti: string | null; budget: string | null }) => {
+    // Set field input from prompt
+    if (data.prompt) {
+      setFieldInput(data.prompt);
+    }
+    
+    // Set MBTI if provided
+    if (data.mbti) {
+      setMbti(data.mbti as MBTI);
+    }
+    
+    // Set budget if provided
+    if (data.budget) {
+      setBudget(data.budget);
+    }
+    
+    // Close welcome screen
+    setShowWelcome(false);
+  };
+
   return (
     <div className="flex h-screen relative">
       {/* Sidebar - Always visible regardless of welcome page */}
@@ -220,7 +241,7 @@ export default function App() {
       >
         {showWelcome ? (
           <div className="flex-1 flex justify-center">
-            <WelcomePage onStart={() => setShowWelcome(false)} />
+            <WelcomePage onStart={handleWelcomeComplete} />
           </div>
         ) : (
           <>
