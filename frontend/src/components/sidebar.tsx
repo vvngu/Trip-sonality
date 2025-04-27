@@ -5,6 +5,7 @@ interface SidebarProps {
   width: number;
   onToggle: () => void;
   onNewChat: () => void;
+  onExploreClick: () => void;
 }
 
 const menuItems = [
@@ -12,11 +13,10 @@ const menuItems = [
   "Itinerary",
   "Saved",
   "Updates",
-  "Explore",
   "Create",
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
+const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat, onExploreClick }) => (
   <div
     style={{
       width,
@@ -96,6 +96,29 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat }) => (
           {item}
         </button>
       ))}
+      
+      {/* Special handling for Explore */}
+      <button
+        onClick={onExploreClick}
+        style={{
+          fontFamily: "Georgia, serif",
+          fontSize: "16px",
+          padding: "12px 8px",
+          width: "100%",
+          textAlign: "center",
+          border: "1px solid #d1d5db",
+          backgroundColor: "white",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#f9fafb";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "white";
+        }}
+      >
+        Explore
+      </button>
     </nav>
 
     {/* New Chat button */}
