@@ -260,7 +260,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
                   <h3 className="font-georgia font-semibold mb-1">
                     {placeDetails.name}
                   </h3>
-                  {placeDetails.photos && placeDetails.photos.length > 0 && (
+                  {/* {placeDetails.photos && placeDetails.photos.length > 0 && (
                     <div className="mt-2 mb-2">
                       <img
                         src={placeDetails.photos[0].getUrl({
@@ -271,7 +271,36 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
                         className="w-full rounded-md"
                       />
                     </div>
-                  )}
+                  )} */}
+
+                  {/* Display photo if available (with error fallback) */}
+                  {placeDetails.photos &&
+                    placeDetails.photos.length > 0 &&
+                    (() => {
+                      // 1. 取得可能的照片 URL
+                      const photoUrl = placeDetails.photos[0].getUrl({
+                        maxWidth: 200,
+                        maxHeight: 150,
+                      });
+                      // 2. 如果不存在就不渲染
+                      if (!photoUrl) return null;
+                      return (
+                        <div className="mt-2 mb-2">
+                          <img
+                            src={photoUrl}
+                            alt={placeDetails.name || "Location"}
+                            className="w-full rounded-md"
+                            onError={(e) => {
+                              // 加载失败时移除这张 <img>
+                              (
+                                e.currentTarget as HTMLImageElement
+                              ).style.display = "none";
+                            }}
+                          />
+                        </div>
+                      );
+                    })()}
+
                   {placeDetails.types && placeDetails.types.length > 0 && (
                     <p className="text-sm">
                       <span className="font-semibold">Type:</span>{" "}
