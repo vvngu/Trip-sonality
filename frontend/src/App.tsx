@@ -10,10 +10,58 @@ import Itinerary, {
 } from "./components/itinerary";
 import Select, { SingleValue } from "react-select";
 import { FiShare2, FiCalendar } from "react-icons/fi";
-import { createEvents, EventAttributes } from "ics";
 // import { FaSignInAlt } from "react-icons/fa";
 import WelcomePage from "./components/WelcomePage";
 import ShareModal from "./components/ShareModal";
+import SampleGuides from "./components/sampleGuides";
+
+// Simplified event attributes interface for ics
+interface EventAttr {
+  start: [number, number, number, number, number];
+  duration: { hours: number };
+  title: string;
+  description?: string;
+  location?: string;
+  [key: string]: any;
+}
+
+// Simple mock implementation for the ics library's createEvents function
+const createEvents = (
+  events: EventAttr[], 
+  callback: (error: Error | null, value: string | undefined) => void
+): void => {
+  // In a real implementation, this would generate ICS content
+  console.log("Creating events:", events);
+  
+  // For our mock, we'll just create a simple iCalendar file with basic content
+  const icsContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Trip-sonality//Trip-sonality Calendar//EN",
+    ...events.flatMap(event => [
+      "BEGIN:VEVENT",
+      `SUMMARY:${event.title}`,
+      `DTSTART:${formatDate(event.start)}`,
+      `DURATION:PT${event.duration.hours}H`,
+      event.description ? `DESCRIPTION:${event.description}` : "",
+      event.location ? `LOCATION:${event.location}` : "",
+      "END:VEVENT"
+    ]),
+    "END:VCALENDAR"
+  ].filter(Boolean).join("\r\n");
+  
+  callback(null, icsContent);
+};
+
+// Helper to format date for iCalendar
+const formatDate = (dateArr: [number, number, number, number, number]): string => {
+  const [year, month, day, hour, minute] = dateArr;
+  return `${year}${pad(month)}${pad(day)}T${pad(hour)}${pad(minute)}00Z`;
+};
+
+const pad = (num: number): string => {
+  return num.toString().padStart(2, "0");
+};
 
 //
 // ——— Types ———
@@ -97,6 +145,7 @@ export default function App() {
     undefined
   );
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [showExplore, setShowExplore] = useState(false);
 
   const sidebarDraggingRef = useRef(false);
   const mapPanelDraggingRef = useRef(false);
@@ -181,23 +230,29 @@ export default function App() {
   // Handler for "New Chat" button in sidebar
   const handleNewChat = () => {
     setShowWelcome(true);
+    setShowExplore(false);
+  };
+
+  // Handler for Explore button
+  const handleExploreClick = () => {
+    setShowExplore(true);
+    setShowWelcome(false);
   };
 
   // Handler for Share button
   const handleShareClick = () => {
     setShareModalOpen(true);
   };
-  type ItineraryDay = (typeof placeholderItinerary)[number];
   const handleExportCalendar = () => {
     const tripStartDate = new Date();
 
-    // 创建 ICS 事件数组
-    const events: EventAttributes[] = placeholderItinerary.flatMap(
-      (day: ItineraryDay, idx: number) => {
+    // Create ICS events array
+    const events: EventAttr[] = placeholderItinerary.flatMap(
+      (day, idx: number) => {
         const dayDate = new Date(tripStartDate);
         dayDate.setDate(tripStartDate.getDate() + idx);
 
-        // 返回固定 5 元组 [year, month, day, hour, minute]
+        // Helper to convert time string to [year, month, day, hour, minute] tuple
         const toYMDHM = (
           timeStr: string
         ): [number, number, number, number, number] => {
@@ -214,9 +269,9 @@ export default function App() {
           ];
         };
 
-        // "吃饭" 事件
+        // Food event
         const foodStart = toYMDHM(day.food.time);
-        const foodEvent: EventAttributes = {
+        const foodEvent: EventAttr = {
           title: `🍴 ${day.food.place}`,
           start: foodStart,
           duration: { hours: 1 },
@@ -224,9 +279,9 @@ export default function App() {
           location: day.food.place,
         };
 
-        // 景点活动事件
+        // Activity events
         const activityEvents = day.activities.map((act) => {
-          // 提取前两部分生成 start 元组
+          // Extract time components
           const timePart = `${act.time.split(" ")[0]} ${
             act.time.split(" ")[1]
           }`;
@@ -239,15 +294,15 @@ export default function App() {
             duration: { hours: durHours },
             description: `Cost: ${act.cost}`,
             location: act.place,
-          } as EventAttributes;
+          } as EventAttr;
         });
 
         return [foodEvent, ...activityEvents];
       }
     );
 
-    // 生成 .ics 并触发下载
-    createEvents(events, (error, value) => {
+    // Generate .ics file and trigger download
+    createEvents(events, (error: Error | null, value: string | undefined) => {
       if (error) {
         console.error(error);
         return;
@@ -295,6 +350,7 @@ export default function App() {
           width={sidebarWidth}
           onToggle={() => setCollapsed(true)}
           onNewChat={handleNewChat}
+          onExploreClick={handleExploreClick}
         />
       )}
       {collapsed && (
@@ -319,7 +375,7 @@ export default function App() {
         onClose={() => setShareModalOpen(false)}
       />
 
-      {/* Main Content - Either welcome page or main app */}
+      {/* Main Content - Now includes explore page option */}
       <div
         className="flex-1 flex flex-col font-sans bg-white"
         ref={containerRef}
@@ -328,6 +384,8 @@ export default function App() {
           <div className="flex-1 flex justify-center">
             <WelcomePage onStart={handleWelcomeComplete} />
           </div>
+        ) : showExplore ? (
+          <SampleGuides />
         ) : (
           <>
             {/* Top Buttons with Divider */}
