@@ -121,6 +121,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
   );
   const [placeDetails, setPlaceDetails] =
     useState<google.maps.places.PlaceResult | null>(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyCO7OMyTxvd0--cyNO4muoy7_jpcOEPsEU",
@@ -176,6 +177,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
   const handleMarkerClick = (loc: ItineraryLocation) => {
     setSelectedLoc(loc);
     setPlaceDetails(null);
+    setCurrentPhotoIndex(0); // Reset photo index when selecting a new place
     if (!mapRef) return;
     const service = new window.google.maps.places.PlacesService(mapRef);
     service.findPlaceFromQuery(
@@ -194,6 +196,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
                 "name",
                 "formatted_address",
                 "rating",
+                "reviews",
                 "opening_hours",
                 "formatted_phone_number",
                 "photos",
@@ -213,6 +216,22 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
         }
       }
     );
+  };
+
+  const nextPhoto = () => {
+    if (placeDetails?.photos) {
+      setCurrentPhotoIndex((prevIndex) => 
+        prevIndex === placeDetails.photos!.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+  };
+
+  const prevPhoto = () => {
+    if (placeDetails?.photos) {
+      setCurrentPhotoIndex((prevIndex) => 
+        prevIndex === 0 ? placeDetails.photos!.length - 1 : prevIndex - 1
+      );
+    }
   };
 
   const zoom = highlightedPlace || selectedLoc ? 15 : 12;
@@ -254,45 +273,88 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
             position={selectedLoc.position}
             onCloseClick={() => setSelectedLoc(null)}
           >
-            <div className="max-w-xs">
+            <div className="max-w-xs font-sans">
               {placeDetails ? (
                 <>
-                  <h3 className="font-georgia font-semibold mb-1">
+                  <h3 className="font-georgia font-semibold mb-1 text-lg">
                     {placeDetails.name}
                   </h3>
+                  
+                  {/* Photo Gallery */}
                   {placeDetails.photos && placeDetails.photos.length > 0 && (
-                    <div className="mt-2 mb-2">
+                    <div className="mt-2 mb-3 relative">
                       <img
-                        src={placeDetails.photos[0].getUrl({
-                          maxWidth: 200,
-                          maxHeight: 150,
+                        src={placeDetails.photos[currentPhotoIndex].getUrl({
+                          maxWidth: 600,
+                          maxHeight: 400,
                         })}
-                        alt={placeDetails.name || "Location"}
-                        className="w-full rounded-md"
+                        alt={`${placeDetails.name || "Location"} - Photo ${currentPhotoIndex + 1}`}
+                        className="w-full h-36 object-cover rounded-md"
                       />
+                      
+                      {/* Photo Navigation */}
+                      {placeDetails.photos.length > 1 && (
+                        <>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
+                            className="absolute left-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
+                            aria-label="Previous photo"
+                          >
+                            ◀
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
+                            className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
+                            aria-label="Next photo"
+                          >
+                            ▶
+                          </button>
+                          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+                            <div className="bg-black/50 px-2 py-0.5 rounded-full text-white text-xs">
+                              {currentPhotoIndex + 1} / {placeDetails.photos.length}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
-                  {placeDetails.types && placeDetails.types.length > 0 && (
-                    <p className="text-sm">
-                      <span className="font-semibold">Type:</span>{" "}
-                      {placeDetails.types[0].replace(/_/g, " ")}
-                    </p>
-                  )}
-                  <p className="text-sm">{placeDetails.formatted_address}</p>
-                  {placeDetails.rating && <p>Rating: {placeDetails.rating}</p>}
-                  {placeDetails.formatted_phone_number && (
-                    <p>Phone: {placeDetails.formatted_phone_number}</p>
-                  )}
+                  
+                  {/* Location Info */}
+                  <div className="mb-3">
+                    <p className="text-sm">{placeDetails.formatted_address}</p>
+                    {placeDetails.types && placeDetails.types.length > 0 && (
+                      <p className="text-sm mt-1">
+                        <span className="font-semibold">Category:</span>{" "}
+                        {placeDetails.types[0].replace(/_/g, " ")}
+                      </p>
+                    )}
+                    {placeDetails.rating && (
+                      <div className="flex items-center mt-1">
+                        <span className="font-semibold text-sm mr-1">Rated:</span>
+                        <span className="text-sm">{placeDetails.rating}⭐</span>
+                      </div>
+                    )}
+                    {placeDetails.formatted_phone_number && (
+                      <p className="text-sm mt-1">
+                        <span className="font-semibold">Call:</span> {placeDetails.formatted_phone_number}
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* Opening Hours */}
                   {placeDetails.opening_hours?.weekday_text && (
-                    <ul className="text-xs mt-2 space-y-1">
-                      {placeDetails.opening_hours.weekday_text.map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
-                    </ul>
+                    <div className="mt-2 border-t pt-2">
+                      <h4 className="font-semibold text-sm mb-1">When To Visit:</h4>
+                      <ul className="text-xs space-y-1">
+                        {placeDetails.opening_hours.weekday_text.map((line) => (
+                          <li key={line}>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </>
               ) : (
-                <p className="text-sm font-georgia">Loading...</p>
+                <p className="text-sm font-georgia">Loading place details...</p>
               )}
             </div>
           </InfoWindow>
