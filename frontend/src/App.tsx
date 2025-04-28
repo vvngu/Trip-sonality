@@ -27,34 +27,38 @@ interface EventAttr {
 
 // Simple mock implementation for the ics library's createEvents function
 const createEvents = (
-  events: EventAttr[], 
+  events: EventAttr[],
   callback: (error: Error | null, value: string | undefined) => void
 ): void => {
   // In a real implementation, this would generate ICS content
   console.log("Creating events:", events);
-  
+
   // For our mock, we'll just create a simple iCalendar file with basic content
   const icsContent = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Trip-sonality//Trip-sonality Calendar//EN",
-    ...events.flatMap(event => [
+    ...events.flatMap((event) => [
       "BEGIN:VEVENT",
       `SUMMARY:${event.title}`,
       `DTSTART:${formatDate(event.start)}`,
       `DURATION:PT${event.duration.hours}H`,
       event.description ? `DESCRIPTION:${event.description}` : "",
       event.location ? `LOCATION:${event.location}` : "",
-      "END:VEVENT"
+      "END:VEVENT",
     ]),
-    "END:VCALENDAR"
-  ].filter(Boolean).join("\r\n");
-  
+    "END:VCALENDAR",
+  ]
+    .filter(Boolean)
+    .join("\r\n");
+
   callback(null, icsContent);
 };
 
 // Helper to format date for iCalendar
-const formatDate = (dateArr: [number, number, number, number, number]): string => {
+const formatDate = (
+  dateArr: [number, number, number, number, number]
+): string => {
   const [year, month, day, hour, minute] = dateArr;
   return `${year}${pad(month)}${pad(day)}T${pad(hour)}${pad(minute)}00Z`;
 };
@@ -128,6 +132,9 @@ const budgetOptionsSelect: BudgetOption[] = [
 // ——— App Component ———
 //
 export default function App() {
+  const [itinerary, setItinerary] = useState<ItineraryDay[]>([
+    ...placeholderItinerary,
+  ]);
   const [themeInput, setThemeInput] = useState<string>("Movie");
   const [locationInput, setLocationInput] = useState<string>("Los Angeles, CA");
   const [datesInput, setDatesInput] = useState<string>("6 days");
@@ -211,14 +218,19 @@ export default function App() {
       mbti,
       budget,
     };
-    // fetch("/api/trip", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(payload),
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => console.log("Response:", data))
-    //   .catch((err) => console.error(err));
+    fetch("/plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Response:", data);
+        if (data.itinerary) {
+          setItinerary(data.itinerary);
+        }
+      })
+      .catch((err) => console.error(err));
     console.log("Payload to send:", payload);
   };
 
@@ -444,7 +456,10 @@ export default function App() {
               {/* Right Panel */}
               <div className="flex flex-col gap-4 flex-1">
                 {/* Itinerary */}
-                <Itinerary onPlaceHover={setHighlightedPlace} />
+                <Itinerary
+                  itinerary={itinerary}
+                  onPlaceHover={setHighlightedPlace}
+                />
 
                 {/* Input Section */}
                 <div className="panel rounded-custom">

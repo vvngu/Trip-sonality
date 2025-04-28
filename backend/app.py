@@ -1,10 +1,10 @@
 # backend/app.py
 """
-Main backend entry point using MongoDB to store session context.
+主后端入口：接收一次请求，调用 autogen_itinerary.run_agents 生成完整行程，并存储最终结果。
 
-Database:
-  - Name: specified by the MONGODB_DB env var (default: "trip_agent")
-  - Collection: "conversations" stores session records, including session_id, user_input, itinerary, and updated_at timestamp.
+数据库：
+  - 名称：由 MONGODB_DB 环境变量指定（默认为 "trip_agent"）
+  - 集合："conversations"，存储 session_id、请求载荷、最终行程 JSON 和更新时间戳。
 """
 import os
 import json
@@ -13,31 +13,28 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional
 import motor.motor_asyncio
 
+# 导入多代理执行函数
 from autogen_itinerary import run_agents
 
-# Load environment variables from .env
+# 加载环境变量
 load_dotenv()
 
-# MongoDB configuration
-MONGODB_URI = os.getenv("MONGODB_URI")  # e.g., mongodb+srv://user:pass@cluster.mongodb.net/dbname
+# MongoDB 配置
+MONGODB_URI = os.getenv("MONGODB_URI")
 MONGODB_DB = os.getenv("MONGODB_DB", "trip_agent")
 if not MONGODB_URI:
-    raise RuntimeError(
-        "Please set the MONGODB_URI environment variable in your .env file."
-    )
+    raise RuntimeError("请在 .env 文件中设置 MONGODB_URI 环境变量。")
 
-# Initialize FastAPI and MongoDB client
+# 初始化 FastAPI 和 MongoDB 客户端
 app = FastAPI()
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
-db = client[MONGODB_DB]
+mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
+db = mongo_client[MONGODB_DB]
 conversations = db.get_collection("conversations")
 
-# Request model for itinerary planning
+# 请求模型：前端一次性传入所有字段
 class ItineraryRequest(BaseModel):
-    session_id: Optional[str] = None
     budget: str
     dates: str
     field: str
@@ -47,70 +44,37 @@ class ItineraryRequest(BaseModel):
 
 @app.on_event("shutdown")
 async def shutdown_db():
-    """Close the MongoDB client when the app shuts down."""
-    client.close()
+    """应用关闭时关闭 MongoDB 客户端。"""
+    mongo_client.close()
 
 @app.post("/plan")
 async def plan(req: ItineraryRequest):
     """
-    Receive user input, maintain session context, and return updated itinerary.
-
-    - If session_id is missing, a new one is generated.
-    - User input is merged with any previous input.
-    - The _previous_itinerary is passed to the agents for context-based revision.
-    - The generated itinerary is stored in MongoDB and returned as a TypeScript code string.
+    接收行程请求，调用 run_agents 生成完整行程，存入 MongoDB 并返回。
     """
-    # 1. Generate or retrieve session_id
-    session_id = req.session_id or str(uuid.uuid4())
+    session_id = str(uuid.uuid4())
+    payload = json.dumps(req.dict())
 
-    # 2. Fetch existing session record
-    record = await conversations.find_one({"session_id": session_id})
+    # 执行多代理管道，获取最终行程 JSON 字符串
+    result_str = await run_agents(payload)
 
-    # 3. Merge new input with existing user_input
-    new_input = req.dict(exclude={"session_id"})
-    if record:
-        merged_input = {**record.get("user_input", {}), **new_input}
-        previous_itinerary = record.get("itinerary")
-    else:
-        merged_input = new_input
-        previous_itinerary = None
-
-    # 4. Prepare payload for agents, include previous itinerary if available
-    payload = merged_input.copy()
-    if previous_itinerary is not None:
-        payload["_previous_itinerary"] = previous_itinerary
-
-    # 5. Run multi-agent itinerary generation
-    result_str = await run_agents(json.dumps(payload))
-
-    # 6. Attempt to parse the returned JSON itinerary
+    # 尝试解析 JSON
     try:
-        new_itinerary = json.loads(result_str)
+        itinerary = json.loads(result_str)
     except json.JSONDecodeError:
-        new_itinerary = None
+        itinerary = None
 
-    # 7. Upsert the session record in MongoDB with updated data and timestamp
-    now = datetime.now(timezone.utc)
-    if record:
-        await conversations.update_one(
-            {"session_id": session_id},
-            {"$set": {
-                "user_input": merged_input,
-                "itinerary": new_itinerary,
-                "updated_at": now
-            }}
-        )
-    else:
-        await conversations.insert_one({
-            "session_id": session_id,
-            "user_input": merged_input,
-            "itinerary": new_itinerary,
-            "updated_at": now
-        })
+    # 存储会话记录
+    record = {
+        "session_id": session_id,
+        "payload": req.dict(),
+        "itinerary": itinerary,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    await conversations.insert_one(record)
 
-    # 8. Return session_id and the TypeScript code string
-    return {"session_id": session_id, "itinerary_ts": result_str}
+    # 返回会话 ID 和行程 JSON
+    return {"session_id": session_id, "itinerary": itinerary}
 
-# To run:
+# 运行：
 # uvicorn app:app --reload
-# Dependencies: fastapi, motor, python-dotenv

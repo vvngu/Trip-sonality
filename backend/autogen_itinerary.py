@@ -49,13 +49,13 @@ cost_tool = CostEstimatorTool()
 # async def poi_search(theme: str, location: str, dates: str, mbti: str, field: str):
 #     """Function wrapper for POI search tool"""
 #     return await poi_tool.run(theme, location, dates, mbti, field)
-async def poi_search(theme: str, location: str, n_days: int, mbti: str, field: str):
+async def poi_search(theme: str, location: str, dates: str, mbti: str, field: str):
     """Function wrapper for POI search tool"""
     # Convert n_days if passed as string like '6 days'
     try:
-        days = int(n_days)
+        days = int(dates)
     except (ValueError, TypeError):
-        days = int(n_days.split()[0]) if isinstance(n_days, str) else 1
+        days = int(dates.split()[0]) if isinstance(dates, str) else 1
     return await poi_tool.run(theme, location, days, mbti, field)
 
 def cost_estimate(items: list):
@@ -172,56 +172,30 @@ Format it cleanly as final output and then respond with TERMINATE.
 # ]You must ensure that the final plan is integrated and complete. YOUR FINAL RESPONSE MUST BE THE COMPLETE PLAN. When the plan is complete and all perspectives are integrated, you can respond with TERMINATE.""",
 # )
 
-
-async def run_agents():
+# async def run_agents():
+async def run_agents(payload: str):
     termination = TextMentionTermination("TERMINATE")
     group_chat = MagenticOneGroupChat(
         [search_agent, detail_agent, plan_agent, format_agent],
         termination_condition=termination,
         model_client=client,
     )
-    await Console(group_chat.run_stream(task="""User request:{
-        "budget": "2500+ USD",
-        "dates": "6 days",
-        "field": "Food",
-        "location": "Los Angeles, CA",
-        "mbti": "ISTJ",
-        "theme": "Movie"
-    }"""))
+    # await Console(group_chat.run_stream(task="""User request:{
+    #     "budget": "2500+ USD",
+    #     "dates": "6 days",
+    #     "field": "Food",
+    #     "location": "Los Angeles, CA",
+    #     "mbti": "ISTJ",
+    #     "theme": "Movie"
+    # }"""))
+    result = await group_chat.run(task=payload)
+    return result
 
 
 if __name__ == "__main__":
     asyncio.run(run_agents())
 
 
-
-
-
-# # Initialize tools
-# poi_tool = POISearchTool()
-# cost_tool = CostEstimatorTool()
-
-# # Wrap tool methods into uniquely named callables for the agent
-# async def poi_search(theme: str, location: str, date: str):
-#     """Function wrapper for POI search tool"""
-#     return await poi_tool.run(theme, location, date)
-
-# def cost_estimate(items: list):
-#     """Function wrapper for cost estimator tool"""
-#     return cost_tool.run(items)
-
-
-# detail_agent = AssistantAgent(
-#     name="detail_agent",
-#     model_client=client,
-#     tools=[poi_search, cost_estimate],  # use uniquely named wrappers
-#     description="Fill in itinerary details using POI and cost estimation tools",
-#     system_message="""
-# You receive the outline and user input. Use the poi_search tool to fetch places 
-# and cost_estimate to assign time, place, and cost for each day.
-# Maintain the JSON structure and reply with "NEXT".
-# """.strip()
-# )
 
 
 # Run the multi-agent pipeline
