@@ -173,23 +173,23 @@ Format it cleanly as final output and then respond with TERMINATE.
 # )
 
 # async def run_agents():
-async def run_agents(payload: str):
+async def run_agents():
     termination = TextMentionTermination("TERMINATE")
     group_chat = MagenticOneGroupChat(
         [search_agent, detail_agent, plan_agent, format_agent],
         termination_condition=termination,
         model_client=client,
     )
-    # await Console(group_chat.run_stream(task="""User request:{
-    #     "budget": "2500+ USD",
-    #     "dates": "6 days",
-    #     "field": "Food",
-    #     "location": "Los Angeles, CA",
-    #     "mbti": "ISTJ",
-    #     "theme": "Movie"
-    # }"""))
-    result = await group_chat.run(task=payload)
-    return result
+    await Console(group_chat.run_stream(task="""User request:{
+        "budget": "2500+ USD",
+        "dates": "6 days",
+        "field": "Food",
+        "location": "Los Angeles, CA",
+        "mbti": "ISTJ",
+        "theme": "Movie"
+    }"""))
+    # result = await group_chat.run(task=payload)
+    # return result
 
 
 if __name__ == "__main__":

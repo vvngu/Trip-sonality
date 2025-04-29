@@ -136,8 +136,8 @@ export default function App() {
     ...placeholderItinerary,
   ]);
   const [themeInput, setThemeInput] = useState<string>("Movie");
-  const [locationInput, setLocationInput] = useState<string>("Los Angeles, CA");
-  const [datesInput, setDatesInput] = useState<string>("6 days");
+  const [locationInput, setLocationInput] = useState<string>("");
+  const [datesInput, setDatesInput] = useState<string>("");
   const [mbti, setMbti] = useState<MBTI>("INFJ");
   const [budget, setBudget] = useState<string>("1500 USD");
   const [fieldInput, setFieldInput] = useState<string>("");
@@ -210,6 +210,11 @@ export default function App() {
   };
 
   const handleSend = () => {
+    if (!locationInput || !datesInput) {
+      alert("Please enter both location and dates before generating an itinerary.");
+      return;
+    }
+
     const payload = {
       theme: themeInput,
       location: locationInput,

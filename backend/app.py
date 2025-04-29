@@ -11,9 +11,10 @@ import json
 import uuid
 from datetime import datetime, timezone
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 import motor.motor_asyncio
+from typing import Optional, Dict
 
 # 导入多代理执行函数
 from autogen_itinerary import run_agents
@@ -32,15 +33,17 @@ app = FastAPI()
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 db = mongo_client[MONGODB_DB]
 conversations = db.get_collection("conversations")
+itineraries = db.get_collection("itineraries")
 
-# 请求模型：前端一次性传入所有字段
-class ItineraryRequest(BaseModel):
-    budget: str
-    dates: str
-    field: str
-    location: str
-    mbti: str
-    theme: str
+# 创建索引
+async def create_indexes():
+    await itineraries.create_index("location")
+    await itineraries.create_index("mbti")
+    await itineraries.create_index("created_at")
+
+@app.on_event("startup")
+async def startup_event():
+    await create_indexes()
 
 @app.on_event("shutdown")
 async def shutdown_db():
@@ -48,33 +51,27 @@ async def shutdown_db():
     mongo_client.close()
 
 @app.post("/plan")
-async def plan(req: ItineraryRequest):
-    """
-    接收行程请求，调用 run_agents 生成完整行程，存入 MongoDB 并返回。
-    """
-    session_id = str(uuid.uuid4())
-    payload = json.dumps(req.dict())
-
-    # 执行多代理管道，获取最终行程 JSON 字符串
-    result_str = await run_agents(payload)
-
-    # 尝试解析 JSON
+async def plan_itinerary(request: ItineraryRequest):
     try:
-        itinerary = json.loads(result_str)
-    except json.JSONDecodeError:
-        itinerary = None
-
-    # 存储会话记录
-    record = {
-        "session_id": session_id,
-        "payload": req.dict(),
-        "itinerary": itinerary,
-        "updated_at": datetime.now(timezone.utc)
-    }
-    await conversations.insert_one(record)
-
-    # 返回会话 ID 和行程 JSON
-    return {"session_id": session_id, "itinerary": itinerary}
+        # Generate itinerary using the existing agents
+        result = await run_agents(request.dict())
+        
+        # Store the itinerary in MongoDB
+        itinerary_doc = {
+            "mbti": request.mbti,
+            "budget": request.budget,
+            "query": request.query,
+            "location": request.location,
+            "dates": request.dates,
+            "current_itinerary": request.current_itinerary,
+            "generated_itinerary": result,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await itineraries.insert_one(itinerary_doc)
+        
+        return {"itinerary": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # 运行：
 # uvicorn app:app --reload
