@@ -136,8 +136,8 @@ export default function App() {
     ...placeholderItinerary,
   ]);
   const [themeInput, setThemeInput] = useState<string>("Movie");
-  const [locationInput, setLocationInput] = useState<string>("");
-  const [datesInput, setDatesInput] = useState<string>("");
+  const [locationInput, setLocationInput] = useState<string>("Los Angeles");
+  const [datesInput, setDatesInput] = useState<string>("6");
   const [mbti, setMbti] = useState<MBTI>("INFJ");
   const [budget, setBudget] = useState<string>("1500 USD");
   const [fieldInput, setFieldInput] = useState<string>("");
@@ -153,6 +153,7 @@ export default function App() {
   );
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [showExplore, setShowExplore] = useState(false);
+  const [isLocked, setIsLocked] = useState(false); // New state to track if inputs are locked
 
   const sidebarDraggingRef = useRef(false);
   const mapPanelDraggingRef = useRef(false);
@@ -203,15 +204,22 @@ export default function App() {
   };
 
   const handleMbtiChange = (opt: SingleValue<OptionType>) => {
-    if (opt) setMbti(opt.value);
+    if (opt && !isLocked) setMbti(opt.value);
   };
   const handleBudgetChange = (opt: SingleValue<BudgetOption>) => {
-    if (opt) setBudget(opt.value);
+    if (opt && !isLocked) setBudget(opt.value);
   };
 
   const handleSend = () => {
-    if (!locationInput || !datesInput) {
-      alert("Please enter both location and dates before generating an itinerary.");
+    if (!locationInput) {
+      alert("Please enter a location before generating an itinerary.");
+      return;
+    }
+
+    if (!datesInput) {
+      alert(
+        "Please enter the length of your trip before generating an itinerary."
+      );
       return;
     }
 
@@ -234,8 +242,11 @@ export default function App() {
         if (data.itinerary) {
           setItinerary(data.itinerary);
         }
+        // Lock the inputs after the first successful send
       })
       .catch((err) => console.error(err));
+    setIsLocked(true);
+    setFieldInput("");
     console.log("Payload to send:", payload);
   };
 
@@ -248,6 +259,8 @@ export default function App() {
   const handleNewChat = () => {
     setShowWelcome(true);
     setShowExplore(false);
+    // Reset locked state when starting a new chat
+    setIsLocked(false);
   };
 
   // Handler for Explore button
@@ -443,6 +456,7 @@ export default function App() {
                   onThemeChange={setThemeInput}
                   onLocationChange={setLocationInput}
                   onDatesChange={setDatesInput}
+                  isLocked={isLocked}
                 />
                 <div className="panel rounded-custom overflow-hidden flex-1 mt-1">
                   <MapView highlightedPlace={highlightedPlace} />
@@ -474,7 +488,7 @@ export default function App() {
                       placeholder="Enter your Interests and Dislikes..."
                       value={fieldInput}
                       onChange={(e) => setFieldInput(e.target.value)}
-                      className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm font-georgia "
+                      className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm font-georgia"
                     />
                     <button
                       onClick={handleSend}
@@ -498,107 +512,120 @@ export default function App() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between space-x-4">
-                    {/* MBTI Select */}
+                    {/* MBTI - Display as text when locked */}
                     <div className="rounded-full border border-gray-300 flex items-center px-3 shadow-sm hover:border-gray-400 transition-colors">
-                      <span className="text-xs text-gray-600 font-medium font-georgia ">
+                      <span className="text-xs text-gray-600 font-medium font-georgia">
                         MBTI:
                       </span>
-                      <Select<OptionType, false>
-                        options={mbtiOptions}
-                        value={
-                          mbtiOptions.find((o) => o.value === mbti) || null
-                        }
-                        onChange={handleMbtiChange}
-                        isSearchable={false}
-                        menuPlacement="auto" // try "top" if you always want it above
-                        menuPortalTarget={document.body}
-                        styles={{
-                          control: (base) => ({
-                            ...base,
-                            backgroundColor: "transparent",
-                            border: "none",
-                            boxShadow: "none",
-                            minHeight: "auto",
-                            fontSize: "0.65rem", // even smaller
-                          }),
-                          singleValue: (base) => ({
-                            ...base,
-                            color: "#ef4444", // only selected = red
-                          }),
-                          option: (base, state) => ({
-                            ...base,
-                            color: "black", // dropdown items = black
-                            backgroundColor: state.isFocused
-                              ? "#f3f4f6"
-                              : "white",
-                            cursor: "pointer",
-                            fontSize: "0.65rem",
-                          }),
-                          dropdownIndicator: (base) => ({
-                            ...base,
-                            color: "black",
-                            padding: 2,
-                          }),
-                          indicatorSeparator: () => ({ display: "none" }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999, // make sure it floats above everything
-                          }),
-                        }}
-                        className="w-auto text-xs font-georgia "
-                      />
+                      {isLocked ? (
+                        <span className="text-xs text-red-500 font-georgia ml-1 py-1">
+                          {mbti}
+                        </span>
+                      ) : (
+                        <Select<OptionType, false>
+                          options={mbtiOptions}
+                          value={
+                            mbtiOptions.find((o) => o.value === mbti) || null
+                          }
+                          onChange={handleMbtiChange}
+                          isSearchable={false}
+                          menuPlacement="auto"
+                          menuPortalTarget={document.body}
+                          styles={{
+                            control: (base) => ({
+                              ...base,
+                              backgroundColor: "transparent",
+                              border: "none",
+                              boxShadow: "none",
+                              minHeight: "auto",
+                              fontSize: "0.65rem",
+                            }),
+                            singleValue: (base) => ({
+                              ...base,
+                              color: "#ef4444",
+                            }),
+                            option: (base, state) => ({
+                              ...base,
+                              color: "black",
+                              backgroundColor: state.isFocused
+                                ? "#f3f4f6"
+                                : "white",
+                              cursor: "pointer",
+                              fontSize: "0.65rem",
+                            }),
+                            dropdownIndicator: (base) => ({
+                              ...base,
+                              color: "black",
+                              padding: 2,
+                            }),
+                            indicatorSeparator: () => ({ display: "none" }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999,
+                            }),
+                          }}
+                          className="w-auto text-xs font-georgia"
+                        />
+                      )}
                     </div>
 
-                    {/* Budget Select */}
+                    {/* Budget - Display as text when locked */}
                     <div className="rounded-full border border-gray-300 flex items-center px-3 shadow-sm hover:border-gray-400 transition-colors">
-                      <span className="text-xs text-gray-600 font-medium font-georgia ">
+                      <span className="text-xs text-gray-600 font-medium font-georgia">
                         Budget:
                       </span>
-                      <Select<BudgetOption, false>
-                        options={budgetOptionsSelect}
-                        value={
-                          budgetOptionsSelect.find((o) => o.value === budget) ||
-                          null
-                        }
-                        onChange={handleBudgetChange}
-                        isSearchable={false}
-                        menuPlacement="auto" // try "top" if you always want it above
-                        menuPortalTarget={document.body}
-                        styles={{
-                          control: (base) => ({
-                            ...base,
-                            backgroundColor: "transparent",
-                            border: "none",
-                            boxShadow: "none",
-                            minHeight: "auto",
-                            fontSize: "0.65rem",
-                          }),
-                          singleValue: (base) => ({
-                            ...base,
-                            color: "#ef4444",
-                          }),
-                          option: (base, state) => ({
-                            ...base,
-                            color: "black",
-                            backgroundColor: state.isFocused
-                              ? "#f3f4f6"
-                              : "white",
-                            cursor: "pointer",
-                            fontSize: "0.65rem",
-                          }),
-                          dropdownIndicator: (base) => ({
-                            ...base,
-                            color: "black",
-                            padding: 2,
-                          }),
-                          indicatorSeparator: () => ({ display: "none" }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999, // make sure it floats above everything
-                          }),
-                        }}
-                        className="w-auto text-xs font-georgia "
-                      />
+                      {isLocked ? (
+                        <span className="text-xs text-red-500 font-georgia ml-1 py-1">
+                          {budget}
+                        </span>
+                      ) : (
+                        <Select<BudgetOption, false>
+                          options={budgetOptionsSelect}
+                          value={
+                            budgetOptionsSelect.find(
+                              (o) => o.value === budget
+                            ) || null
+                          }
+                          onChange={handleBudgetChange}
+                          isSearchable={false}
+                          menuPlacement="auto"
+                          menuPortalTarget={document.body}
+                          styles={{
+                            control: (base) => ({
+                              ...base,
+                              backgroundColor: "transparent",
+                              border: "none",
+                              boxShadow: "none",
+                              minHeight: "auto",
+                              fontSize: "0.65rem",
+                            }),
+                            singleValue: (base) => ({
+                              ...base,
+                              color: "#ef4444",
+                            }),
+                            option: (base, state) => ({
+                              ...base,
+                              color: "black",
+                              backgroundColor: state.isFocused
+                                ? "#f3f4f6"
+                                : "white",
+                              cursor: "pointer",
+                              fontSize: "0.65rem",
+                            }),
+                            dropdownIndicator: (base) => ({
+                              ...base,
+                              color: "black",
+                              padding: 2,
+                            }),
+                            indicatorSeparator: () => ({ display: "none" }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999,
+                            }),
+                          }}
+                          className="w-auto text-xs font-georgia"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
