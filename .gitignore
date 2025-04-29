@@ -17,3 +17,6 @@ Thumbs.db
 # TypeScript 编译输出（如有设置）
 frontend/build/
 *.tsbuildinfo
+
+.venv/
+venv/
