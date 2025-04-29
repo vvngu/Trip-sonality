@@ -89,10 +89,17 @@ export type ItineraryDay = (typeof placeholderItinerary)[number];
 
 interface ItineraryProps {
   itinerary: ItineraryDay[];
+  theme: string;
+  location: string;
   onPlaceHover: (place: string | undefined) => void;
 }
 
-export default function Itinerary({ itinerary, onPlaceHover }: ItineraryProps) {
+export default function Itinerary({
+  itinerary,
+  theme,
+  location,
+  onPlaceHover,
+}: ItineraryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const day = itinerary[currentIndex];
 
@@ -233,7 +240,7 @@ export default function Itinerary({ itinerary, onPlaceHover }: ItineraryProps) {
     >
       {/* Header */}
       <h2 className="text-center font-georgia font-medium text-lg mb-1">
-        {itinerary.length} Days Itinerary – Los Angeles Movie Trip
+        {itinerary.length} Days Itinerary – {location} {theme} Trip
       </h2>
       <div className="border-b border-gray-200 w-3/4 mx-auto mb-3"></div>
       <div className="flex justify-center mb-4">
@@ -329,15 +336,11 @@ export default function Itinerary({ itinerary, onPlaceHover }: ItineraryProps) {
         ))}
         <div
           className={`ml-4 ${
-            currentIndex === placeholderItinerary.length - 1
+            currentIndex === itinerary.length - 1
               ? "text-gray-300"
               : "text-gray-600 cursor-pointer"
           }`}
-          onClick={
-            currentIndex < placeholderItinerary.length - 1
-              ? moveToNext
-              : undefined
-          }
+          onClick={currentIndex < itinerary.length - 1 ? moveToNext : undefined}
         >
           →
         </div>

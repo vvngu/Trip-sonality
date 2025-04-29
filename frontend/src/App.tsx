@@ -135,6 +135,7 @@ export default function App() {
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([
     ...placeholderItinerary,
   ]);
+  const [detailResult, setDetailResult] = useState<any>(null);
   const [themeInput, setThemeInput] = useState<string>("Movie");
   const [locationInput, setLocationInput] = useState<string>("Los Angeles, CA");
   const [datesInput, setDatesInput] = useState<string>("6 days");
@@ -218,19 +219,45 @@ export default function App() {
       mbti,
       budget,
     };
-    fetch("/plan", {
+    fetch("http://localhost:8000/plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.text().then((text) => {
+            console.error("API错误响应:", text);
+            throw new Error(`API返回错误: ${res.status} ${text}`);
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
-        console.log("Response:", data);
+        console.log("收到响应：", data);
+
+        // 处理两种JSON数据
         if (data.itinerary) {
           setItinerary(data.itinerary);
         }
+
+        if (data.locations) {
+          // 处理位置数据，例如传递给地图组件
+          // setMapLocations(data.locations);
+          console.log("地点位置数据：", data.locations);
+
+          // 如果您有地图位置状态，可以在这里更新
+          // 例如：
+          // setMapMarkers(data.locations.map(loc => ({
+          //   id: loc.id,
+          //   position: loc.position,
+          //   title: loc.name
+          // })));
+        }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error("请求错误:", err);
+      });
     console.log("Payload to send:", payload);
   };
 
@@ -458,6 +485,8 @@ export default function App() {
                 {/* Itinerary */}
                 <Itinerary
                   itinerary={itinerary}
+                  theme={themeInput}
+                  location={locationInput}
                   onPlaceHover={setHighlightedPlace}
                 />
 

@@ -113,14 +113,42 @@ Generate a JSON array "itinerary" with objects:
 Ensure each day includes exactly two meals and at least one activity. The total cost across all days must not exceed the budget.
 """
 )
-# Agent 4: Format the finalized plan
+# 修改Agent 4：处理并输出两种JSON格式
 format_agent = AssistantAgent(
     "format_agent",
     model_client=client,
-    description="Formatting agent that outputs the plan in polished JSON.",
+    description="Formatting agent that outputs two JSON structures: locations and itinerary.",
     system_message="""
-You are a formatting agent. You will receive the complete plan as JSON.
-Format it cleanly as final output and then respond with TERMINATE.
+You are a formatting agent. You will process the search_agent and plan_agent results to create two JSON objects.
+
+1. Create 'locations' JSON from search_agent's items:
+   Transform each item with fields like name, address, lat, lng into this format:
+   { "id": <index>, "name": "<name>", "position": { "lat": <latitude>, "lng": <longitude> } }
+
+2. Keep the plan_agent's 'itinerary' JSON array unchanged:
+   [
+     {
+       "day": <number>,
+       "food": [
+         { "name": <name>, "time": <start-end>, "cost": <cost> },
+         { "name": <name>, "time": <start-end>, "cost": <cost> }
+       ],
+       "activities": [
+         { "name": <name>, "time": <start-end>, "cost": <cost> },
+         ...
+       ],
+       "summary": <text>
+     },
+     ...
+   ]
+
+Output your response as a single JSON object with two properties:
+{
+  "locations": [ <array of formatted location objects> ],
+  "itinerary": [ <array of day objects> ]
+}
+
+Ensure both arrays are properly formatted valid JSON. Then respond with TERMINATE.
 """
 )
 
@@ -172,24 +200,24 @@ Format it cleanly as final output and then respond with TERMINATE.
 # ]You must ensure that the final plan is integrated and complete. YOUR FINAL RESPONSE MUST BE THE COMPLETE PLAN. When the plan is complete and all perspectives are integrated, you can respond with TERMINATE.""",
 # )
 
-# async def run_agents():
-async def run_agents(payload: str):
+async def run_agents():
+# async def run_agents(payload: str):
     termination = TextMentionTermination("TERMINATE")
     group_chat = MagenticOneGroupChat(
         [search_agent, detail_agent, plan_agent, format_agent],
         termination_condition=termination,
         model_client=client,
     )
-    # await Console(group_chat.run_stream(task="""User request:{
-    #     "budget": "2500+ USD",
-    #     "dates": "6 days",
-    #     "field": "Food",
-    #     "location": "Los Angeles, CA",
-    #     "mbti": "ISTJ",
-    #     "theme": "Movie"
-    # }"""))
-    result = await group_chat.run(task=payload)
-    return result
+    await Console(group_chat.run_stream(task="""User request:{
+        "budget": "2500+ USD",
+        "dates": "6 days",
+        "field": "Food",
+        "location": "Los Angeles, CA",
+        "mbti": "ISTJ",
+        "theme": "Movie"
+    }"""))
+    # result = await group_chat.run(task=payload)
+    # return result
 
 
 if __name__ == "__main__":
