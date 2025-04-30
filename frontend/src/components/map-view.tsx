@@ -283,51 +283,76 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
                   {/* Photo Gallery */}
                   {placeDetails.photos && placeDetails.photos.length > 0 && (
                     <div className="mt-2 mb-3 relative">
-                      <img
-                        src={placeDetails.photos[currentPhotoIndex].getUrl({
-                          maxWidth: 600,
-                          maxHeight: 400,
-                        })}
-                        alt={`${placeDetails.name || "Location"} - Photo ${
-                          currentPhotoIndex + 1
-                        }`}
-                        className="w-full h-36 object-cover rounded-md"
-                      />
+                      <div className="w-full h-36 rounded-md overflow-hidden bg-gray-100">
+                        {/* 添加 try-catch 和 onError 处理 */}
+                        {(() => {
+                          try {
+                            const photoUrl = placeDetails.photos[
+                              currentPhotoIndex
+                            ].getUrl({
+                              maxWidth: 600,
+                              maxHeight: 400,
+                            });
+                            return (
+                              <img
+                                src={photoUrl}
+                                alt={`${
+                                  placeDetails.name || "Location"
+                                } - Photo ${currentPhotoIndex + 1}`}
+                                className="w-full h-36 object-cover rounded-md"
+                                onError={(e) => {
+                                  // 如果图片加载失败，显示备用图片
+                                  console.error("Photo failed to load:", e);
+                                  e.currentTarget.src =
+                                    "https://via.placeholder.com/600x400?text=No+Image+Available";
+                                }}
+                              />
+                            );
+                          } catch (error) {
+                            console.error("Error getting photo URL:", error);
+                            return (
+                              <div className="w-full h-36 flex items-center justify-center bg-gray-200 text-gray-500">
+                                <span>Photo unavailable</span>
+                              </div>
+                            );
+                          }
+                        })()}
+                      </div>
 
-                      {/* Photo Navigation */}
-                      {placeDetails.photos.length > 1 && (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              prevPhoto();
-                            }}
-                            className="absolute left-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
-                            aria-label="Previous photo"
-                          >
-                            ◀
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              nextPhoto();
-                            }}
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
-                            aria-label="Next photo"
-                          >
-                            ▶
-                          </button>
-                          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
-                            <div className="bg-black/50 px-2 py-0.5 rounded-full text-white text-xs">
-                              {currentPhotoIndex + 1} /{" "}
-                              {placeDetails.photos.length}
+                      {/* Photo Navigation - 仅在确实有多张照片时显示 */}
+                      {placeDetails.photos &&
+                        placeDetails.photos.length > 1 && (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                prevPhoto();
+                              }}
+                              className="absolute left-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
+                              aria-label="Previous photo"
+                            >
+                              ◀
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                nextPhoto();
+                              }}
+                              className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 p-1 rounded-full"
+                              aria-label="Next photo"
+                            >
+                              ▶
+                            </button>
+                            <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+                              <div className="bg-black/50 px-2 py-0.5 rounded-full text-white text-xs">
+                                {currentPhotoIndex + 1} /{" "}
+                                {placeDetails.photos.length}
+                              </div>
                             </div>
-                          </div>
-                        </>
-                      )}
+                          </>
+                        )}
                     </div>
                   )}
-
                   {/* Location Info */}
                   <div className="mb-3">
                     <p className="text-sm">{placeDetails.formatted_address}</p>
