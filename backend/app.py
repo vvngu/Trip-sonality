@@ -48,6 +48,7 @@ app.add_middleware(
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 db = mongo_client[MONGODB_DB]
 conversations = db.get_collection("conversations")
+itineraries = db.get_collection("itineraries")
 
 # --- API 请求和响应模型 ---
 
