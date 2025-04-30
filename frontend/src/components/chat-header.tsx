@@ -1,4 +1,5 @@
 import React from "react";
+import Select from "react-select";
 
 interface ChatHeaderProps {
   theme: string;
@@ -9,6 +10,74 @@ interface ChatHeaderProps {
   onDatesChange: (value: string) => void;
   isLocked?: boolean; // New prop to determine if fields are locked
 }
+
+// 主题选项
+const themeOptions = [{ value: "Movie", label: "Movie" }];
+
+// 自定义样式以匹配现有UI
+const customSelectStyles = {
+  control: (base: any) => ({
+    ...base,
+    border: "none",
+    boxShadow: "none",
+    background: "transparent",
+    minHeight: "unset",
+    cursor: "pointer",
+    width: "100%",
+    height: "100%",
+  }),
+  valueContainer: (base: any) => ({
+    ...base,
+    padding: "0",
+    height: "100%",
+  }),
+  singleValue: (base: any) => ({
+    ...base,
+    fontFamily: "georgia",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+    color: "rgb(31, 41, 55)",
+  }),
+  placeholder: (base: any) => ({
+    ...base,
+    fontFamily: "georgia",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+  }),
+  indicatorsContainer: (base: any) => ({
+    ...base,
+    padding: "0",
+  }),
+  dropdownIndicator: (base: any) => ({
+    ...base,
+    padding: "0 8px",
+  }),
+  menu: (base: any) => ({
+    ...base,
+    fontFamily: "georgia",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+    width: "100%",
+    zIndex: 9999, // 增加z-index确保下拉框不被其他元素遮挡
+  }),
+  menuList: (base: any) => ({
+    ...base,
+    fontFamily: "georgia",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+  }),
+  option: (base: any, state: any) => ({
+    ...base,
+    fontFamily: "georgia",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+    backgroundColor: state.isSelected ? "rgb(243, 244, 246)" : "white",
+    color: "rgb(31, 41, 55)",
+    "&:hover": {
+      backgroundColor: "rgb(243, 244, 246)",
+    },
+  }),
+};
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   theme,
@@ -29,13 +98,23 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           {theme}
         </span>
       ) : (
-        <input
-          type="text"
-          placeholder="Enter theme"
-          className="flex-1 bg-transparent focus:outline-none font-georgia font-medium text-sm"
-          value={theme}
-          onChange={(e) => onThemeChange(e.target.value)}
-        />
+        <div className="flex-1" style={{ height: "24px" }}>
+          <Select
+            options={themeOptions}
+            value={
+              themeOptions.find((option) => option.value === theme) ||
+              themeOptions[0]
+            }
+            onChange={(selectedOption) =>
+              onThemeChange(selectedOption ? selectedOption.value : "Movie")
+            }
+            styles={customSelectStyles}
+            isSearchable={false}
+            placeholder="Select theme"
+            menuPortalTarget={document.body}
+            classNamePrefix="theme-select"
+          />
+        </div>
       )}
     </div>
     <div className="p-3 border-r border-gray-200 flex items-center space-x-2">
