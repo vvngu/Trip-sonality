@@ -124,11 +124,11 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
     
     agents=[
         summarize_agent,
-        # search_agent,
-        # web_content_agent,
-        # poi_activity_agent,
-        # plan_agent,
-        # critic_agent,
+        search_agent,
+        web_content_agent,
+        poi_activity_agent,
+        plan_agent,
+        critic_agent,
         format_agent
     ]
 
