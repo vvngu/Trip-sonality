@@ -14,7 +14,7 @@ Your goal is to validate and summarize the above input into a **structured JSON 
 {
   "theme": "<string>",          // inferred or default to "Movie"
   "location": "<string>",       // must not be empty; return null if missing
-  "dates": <int>,               // number of days, e.g., 3
+  "days": <int>,               // number of days, e.g., 3
   "start": "<YYYY-MM-DD>",      // optional: inferred or today’s date if missing
   "end": "<YYYY-MM-DD>",        // optional: inferred from start + days
   "mbti": "<string>",           // copy from input
@@ -51,7 +51,7 @@ Always return a clean, valid JSON object — do not include comments or explanat
 {
   "theme": "Movie",
   "location": "Los Angeles",
-  "dates": 5,
+  "days": 5,
   "start": "2024-05-05",
   "end": "2024-05-09",
   "mbti": "ISTJ",

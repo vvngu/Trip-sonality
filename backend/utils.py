@@ -11,3 +11,13 @@ def load_prompt(file: str) -> str:
     except Exception as e:
         print(f"加载 Prompt 文件 {path} 时出错: {e}")
         return "You are a helpful AI assistant."
+    
+
+def clean_json_content(raw: str) -> str:
+    print(raw)
+    raw = raw.split("TERMINATE")[0].strip()
+    if raw.startswith("```json"):
+        raw = raw[len("```json"):].strip()
+    if raw.endswith("```"):
+        raw = raw[:-3].strip()
+    return raw

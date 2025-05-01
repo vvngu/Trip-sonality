@@ -1,8 +1,7 @@
 import asyncio
 from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_agentchat.conditions import TextMentionTermination
-from agents.summarize_agent import summarize_agent
-from config import client  # 你全局的 model_client（gpt-4）
+from backend.agents.summarize_agent import summarize_agent
 
 async def test_summarize():
     input_json = {
