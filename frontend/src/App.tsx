@@ -67,6 +67,59 @@ const pad = (num: number): string => {
   return num.toString().padStart(2, "0");
 };
 
+// 地点数据类型
+interface LocationData {
+  name: string;
+  position: {
+    lat: number;
+    lng: number;
+  };
+}
+
+// 提取位置信息函数
+const extractLocationsFromItinerary = (
+  itineraryData: any[]
+): LocationData[] => {
+  const locations: LocationData[] = [];
+
+  if (!Array.isArray(itineraryData)) return locations;
+
+  itineraryData.forEach((dayData) => {
+    // 添加食物地点
+    if (
+      dayData.food &&
+      dayData.food.place &&
+      dayData.food.lat &&
+      dayData.food.lng
+    ) {
+      locations.push({
+        name: dayData.food.place,
+        position: {
+          lat: dayData.food.lat,
+          lng: dayData.food.lng,
+        },
+      });
+    }
+
+    // 添加活动地点
+    if (dayData.activities && Array.isArray(dayData.activities)) {
+      dayData.activities.forEach((activity: any) => {
+        if (activity.place && activity.lat && activity.lng) {
+          locations.push({
+            name: activity.place,
+            position: {
+              lat: activity.lat,
+              lng: activity.lng,
+            },
+          });
+        }
+      });
+    }
+  });
+
+  return locations;
+};
+
 //
 // ——— Types ———
 //
@@ -156,6 +209,13 @@ export default function App() {
   const [showExplore, setShowExplore] = useState(false);
   const [isLocked, setIsLocked] = useState(false); // New state to track if inputs are locked
 
+  // 新增：加载状态
+  const [isLoading, setIsLoading] = useState(false);
+  // 新增：地点数据 (用于地图显示)
+  const [locations, setLocations] = useState<LocationData[]>([]);
+  // 新增：SessionID
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
   const sidebarDraggingRef = useRef(false);
   const mapPanelDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -224,14 +284,20 @@ export default function App() {
       return;
     }
 
+    // 设置加载状态为true
+    setIsLoading(true);
+
     const payload = {
-      theme: themeInput,
-      location: locationInput,
-      dates: datesInput,
-      field: fieldInput,
-      mbti,
-      budget,
+      mbti: mbti,
+      budget: parseInt(budget.split(" ")[0]),
+      query: `Create a ${themeInput} themed trip to ${locationInput} for ${datesInput} days${
+        fieldInput ? ". I'm interested in " + fieldInput : ""
+      }`,
+      current_itinerary: null,
     };
+
+    console.log("Sending payload:", payload);
+
     fetch("http://localhost:8000/plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -247,18 +313,37 @@ export default function App() {
         return res.json();
       })
       .then((data) => {
-        console.log("收到响应：", data);
+        console.log("收到API响应：", data);
 
-        // 处理两种JSON数据
-        if (data.itinerary) {
-          setItinerary(data.itinerary);
+        // 存储会话ID
+        if (data.session_id) {
+          setSessionId(data.session_id);
         }
-        // Lock the inputs after the first successful send
+
+        // 处理数据
+        if (data.data && Array.isArray(data.data)) {
+          // 设置行程数据
+          setItinerary(data.data);
+
+          // 从数据中提取位置信息用于地图
+          const locationData = extractLocationsFromItinerary(data.data);
+          setLocations(locationData);
+          console.log("提取的位置数据:", locationData);
+        } else {
+          console.warn("API返回的数据格式不符合预期:", data);
+        }
       })
-      .catch((err) => console.error(err));
-    setIsLocked(true);
-    setFieldInput("");
-    console.log("Payload to send:", payload);
+      .catch((err) => {
+        console.error("请求错误:", err);
+        alert("获取行程失败，请稍后重试");
+      })
+      .finally(() => {
+        // 无论成功失败，都结束加载状态
+        setIsLoading(false);
+        // 锁定输入
+        setIsLocked(true);
+        setFieldInput("");
+      });
   };
 
   // Save welcome state to localStorage when it changes
@@ -272,6 +357,10 @@ export default function App() {
     setShowExplore(false);
     // Reset locked state when starting a new chat
     setIsLocked(false);
+    // 重置为初始状态
+    setItinerary([...placeholderItinerary]);
+    setSessionId(null);
+    setLocations([]);
   };
 
   // Handler for Explore button
@@ -288,59 +377,55 @@ export default function App() {
     const tripStartDate = new Date();
 
     // Create ICS events array
-    const events: EventAttr[] = placeholderItinerary.flatMap(
-      (day, idx: number) => {
-        const dayDate = new Date(tripStartDate);
-        dayDate.setDate(tripStartDate.getDate() + idx);
+    const events: EventAttr[] = itinerary.flatMap((day, idx: number) => {
+      const dayDate = new Date(tripStartDate);
+      dayDate.setDate(tripStartDate.getDate() + idx);
 
-        // Helper to convert time string to [year, month, day, hour, minute] tuple
-        const toYMDHM = (
-          timeStr: string
-        ): [number, number, number, number, number] => {
-          const [hm, suffix] = timeStr.split(" ");
-          let [h, m] = hm.split(":").map(Number);
-          if (suffix === "PM" && h < 12) h += 12;
-          if (suffix === "AM" && h === 12) h = 0;
-          return [
-            dayDate.getFullYear(),
-            dayDate.getMonth() + 1,
-            dayDate.getDate(),
-            h,
-            m,
-          ];
-        };
+      // Helper to convert time string to [year, month, day, hour, minute] tuple
+      const toYMDHM = (
+        timeStr: string
+      ): [number, number, number, number, number] => {
+        const [hm, suffix] = timeStr.split(" ");
+        let [h, m] = hm.split(":").map(Number);
+        if (suffix === "PM" && h < 12) h += 12;
+        if (suffix === "AM" && h === 12) h = 0;
+        return [
+          dayDate.getFullYear(),
+          dayDate.getMonth() + 1,
+          dayDate.getDate(),
+          h,
+          m,
+        ];
+      };
 
-        // Food event
-        const foodStart = toYMDHM(day.food.time);
-        const foodEvent: EventAttr = {
-          title: `🍴 ${day.food.place}`,
-          start: foodStart,
-          duration: { hours: 1 },
-          description: `Cost: ${day.food.cost}`,
-          location: day.food.place,
-        };
+      // Food event
+      const foodStart = toYMDHM(day.food.time);
+      const foodEvent: EventAttr = {
+        title: `🍴 ${day.food.place}`,
+        start: foodStart,
+        duration: { hours: 1 },
+        description: `Cost: ${day.food.cost}`,
+        location: day.food.place,
+      };
 
-        // Activity events
-        const activityEvents = day.activities.map((act) => {
-          // Extract time components
-          const timePart = `${act.time.split(" ")[0]} ${
-            act.time.split(" ")[1]
-          }`;
-          const [year, month, date, startH, startM] = toYMDHM(timePart);
-          const hoursMatch = act.time.match(/\((\d+)h\)/);
-          const durHours = hoursMatch ? Number(hoursMatch[1]) : 1;
-          return {
-            title: `🎬 ${act.place}`,
-            start: [year, month, date, startH, startM],
-            duration: { hours: durHours },
-            description: `Cost: ${act.cost}`,
-            location: act.place,
-          } as EventAttr;
-        });
+      // Activity events
+      const activityEvents = day.activities.map((act) => {
+        // Extract time components
+        const timePart = `${act.time.split(" ")[0]} ${act.time.split(" ")[1]}`;
+        const [year, month, date, startH, startM] = toYMDHM(timePart);
+        const hoursMatch = act.time.match(/\((\d+)h\)/);
+        const durHours = hoursMatch ? Number(hoursMatch[1]) : 1;
+        return {
+          title: `🎬 ${act.place}`,
+          start: [year, month, date, startH, startM],
+          duration: { hours: durHours },
+          description: `Cost: ${act.cost}`,
+          location: act.place,
+        } as EventAttr;
+      });
 
-        return [foodEvent, ...activityEvents];
-      }
-    );
+      return [foodEvent, ...activityEvents];
+    });
 
     // Generate .ics file and trigger download
     createEvents(events, (error: Error | null, value: string | undefined) => {
@@ -429,6 +514,18 @@ export default function App() {
           <SampleGuides />
         ) : (
           <>
+            {/* Loading Overlay */}
+            {isLoading && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500 mb-4"></div>
+                  <p className="text-gray-700 font-georgia">
+                    Generating your itinerary...
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Top Buttons with Divider */}
             <div className="flex flex-col">
               <div className="flex justify-end p-3 gap-2">
@@ -470,7 +567,10 @@ export default function App() {
                   isLocked={isLocked}
                 />
                 <div className="panel rounded-custom overflow-hidden flex-1 mt-1">
-                  <MapView highlightedPlace={highlightedPlace} />
+                  <MapView
+                    highlightedPlace={highlightedPlace}
+                    locations={locations.length > 0 ? locations : undefined}
+                  />
                 </div>
               </div>
 
@@ -502,10 +602,16 @@ export default function App() {
                       value={fieldInput}
                       onChange={(e) => setFieldInput(e.target.value)}
                       className="w-full p-4 pr-10 border border-gray-200 rounded-lg text-sm font-georgia"
+                      disabled={isLoading} // 加载时禁用输入
                     />
                     <button
                       onClick={handleSend}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                        isLoading
+                          ? "text-gray-300"
+                          : "text-gray-400 hover:text-gray-600"
+                      }`}
+                      disabled={isLoading} // 加载时禁用按钮
                     >
                       {/* paper-plane arrow SVG */}
                       <svg

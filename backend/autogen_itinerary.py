@@ -6,16 +6,25 @@ import json
 import os
 from typing import List, Dict, Any
 
-from backend.config import client
-from backend.utils import clean_json_content
+# from backend.config import client
+# from backend.utils import clean_json_content
 
-from backend.agents.summarize_agent import summarize_agent
-from backend.agents.search_agent import search_agent
-from backend.agents.web_content_agent import web_content_agent
-from backend.agents.poi_activity_agent import poi_activity_agent
-from backend.agents.plan_agent import plan_agent
-from backend.agents.critic_agent import critic_agent
-from backend.agents.format_agent import format_agent
+# from backend.agents.summarize_agent import summarize_agent
+# from backend.agents.search_agent import search_agent
+# from backend.agents.web_content_agent import web_content_agent
+# from backend.agents.poi_activity_agent import poi_activity_agent
+# from backend.agents.plan_agent import plan_agent
+# from backend.agents.critic_agent import critic_agent
+# from backend.agents.format_agent import format_agent
+from config import client
+from utils import clean_json_content
+from agents.summarize_agent import summarize_agent
+from agents.search_agent import search_agent
+from agents.web_content_agent import web_content_agent
+from agents.poi_activity_agent import poi_activity_agent
+from agents.plan_agent import plan_agent
+from agents.critic_agent import critic_agent
+from agents.format_agent import format_agent
 
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_agentchat.teams import MagenticOneGroupChat

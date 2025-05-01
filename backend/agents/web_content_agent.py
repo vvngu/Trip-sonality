@@ -1,6 +1,8 @@
 from autogen_agentchat.agents import AssistantAgent
-from backend.config import client
-from backend.utils import load_prompt
+# from backend.config import client
+# from backend.utils import load_prompt
+from config import client
+from utils import load_prompt
 
 web_content_agent = AssistantAgent(
     name="web_content_agent",

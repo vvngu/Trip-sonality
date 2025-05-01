@@ -3,7 +3,8 @@ import os
 # --- Prompt 加载函数 ---
 def load_prompt(file: str) -> str:
     """从 prompts 文件夹加载指定文件的内容作为 Agent 的系统提示。"""
-    path = os.path.join("backend", "prompts", f"{file}.txt")
+    # path = os.path.join("backend", "prompts", f"{file}.txt")
+    path = os.path.join("prompts", f"{file}.txt")
     try:
         with open(path, "r", encoding="utf-8") as f:
             return f.read()

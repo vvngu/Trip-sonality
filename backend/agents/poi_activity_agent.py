@@ -1,7 +1,10 @@
 from autogen_agentchat.agents import AssistantAgent
-from backend.tools.poi_activity_tool import gather_activity_pois
-from backend.config import client
-from backend.utils import load_prompt
+# from backend.tools.poi_activity_tool import gather_activity_pois
+# from backend.config import client
+# from backend.utils import load_prompt
+from tools.poi_activity_tool import gather_activity_pois
+from config import client
+from utils import load_prompt
 
 poi_activity_agent = AssistantAgent(
     name="poi_activity_agent",

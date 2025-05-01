@@ -8,18 +8,31 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 
+// 添加自定义位置数据接口
+interface LocationData {
+  name: string;
+  position: {
+    lat: number;
+    lng: number;
+  };
+}
+
 interface ItineraryLocation {
   id: number;
   name: string;
   position: google.maps.LatLngLiteral;
 }
+
 interface MapViewProps {
   highlightedPlace?: string;
+  // 添加可选的locations参数
+  locations?: LocationData[];
 }
+
 // Los Angeles coordinates
 const losAngelesCoordinates = { lat: 34.0522, lng: -118.2437 };
 
-// Expanded itinerary locations with more places
+// Expanded itinerary locations with more places (作为备用数据)
 const itineraryLocations = [
   { id: 1, name: "Hollywood Sign", position: { lat: 34.1341, lng: -118.3215 } },
   {
@@ -114,7 +127,7 @@ const itineraryLocations = [
 // /// <reference types="react-scripts" />
 // declare module '@react-google-maps/api';
 
-export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
+export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations }) => {
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [selectedLoc, setSelectedLoc] = useState<ItineraryLocation | null>(
     null
@@ -127,6 +140,21 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
     googleMapsApiKey: "AIzaSyCO7OMyTxvd0--cyNO4muoy7_jpcOEPsEU",
     libraries: ["places"],
   });
+
+  // 将API返回的locations转换为可用的标记点数据
+  const mapLocations = useMemo(() => {
+    if (locations && locations.length > 0) {
+      // 使用API返回的locations数据
+      return locations.map((loc, index) => ({
+        id: index + 1,
+        name: loc.name,
+        position: loc.position
+      }));
+    } else {
+      // 使用默认的itineraryLocations数据
+      return itineraryLocations;
+    }
+  }, [locations]);
 
   // Move useMemo before any conditional returns to maintain hook order
   const mapOptions = useMemo<google.maps.MapOptions>(
@@ -158,13 +186,20 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
 
   // Determine center: prioritize selectedLoc, then highlightedPlace, else default
   const center = useMemo(() => {
-    return (
-      selectedLoc?.position ||
-      itineraryLocations.find((loc) => loc.name === highlightedPlace)
-        ?.position ||
-      losAngelesCoordinates
-    );
-  }, [selectedLoc, highlightedPlace]);
+    // 首先查找当前选中的位置
+    if (selectedLoc?.position) {
+      return selectedLoc.position;
+    }
+    
+    // 然后查找高亮显示的地点
+    const highlightedLoc = mapLocations.find(loc => loc.name === highlightedPlace);
+    if (highlightedLoc) {
+      return highlightedLoc.position;
+    }
+    
+    // 最后使用默认位置
+    return losAngelesCoordinates;
+  }, [selectedLoc, highlightedPlace, mapLocations]);
 
   // Now we can safely do conditional returns after all hooks are called
   if (loadError) return <div>Error loading map</div>;
@@ -246,7 +281,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace }) => {
         options={mapOptions}
         onLoad={onMapLoad}
       >
-        {itineraryLocations.map((loc) => (
+        {mapLocations.map((loc) => (
           <Marker
             key={loc.id}
             position={loc.position}
