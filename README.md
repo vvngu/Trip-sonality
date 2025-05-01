@@ -120,11 +120,11 @@ We built Trip-sonality to solve these pain points by creating deeply personalize
 
 ## Contributing
 
-We welcome contributions to Trip-sonality! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We welcome contributions to Trip-sonality!
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 
