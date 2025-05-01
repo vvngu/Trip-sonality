@@ -13,9 +13,6 @@
     "typescriptreact": "typescriptreact"
   },
   "python.envFile": "${workspaceFolder}/.env",
-  "terminal.integrated.env.osx": {
-    "PYTHONPATH": "${workspaceFolder}/backend"
-  },
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "python.terminal.activateEnvironment": true
 } 

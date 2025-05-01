@@ -1,5 +1,5 @@
 import asyncio
-from agents.search_agent import search_agent
+from backend.agents.search_agent import search_agent
 
 async def test_search():
     summary = {
