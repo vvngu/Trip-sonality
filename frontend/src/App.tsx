@@ -482,7 +482,7 @@ export default function App() {
       {collapsed && (
         <button
           onClick={() => setCollapsed(false)}
-          className="absolute top-4 left-4 p-2 bg-white border border-gray-200 rounded z-50"
+          className="fixed top-4 left-4 p-2 bg-white border border-gray-200 rounded z-50"
         >
           ☰
         </button>
@@ -490,8 +490,12 @@ export default function App() {
       {!collapsed && (
         <div
           onMouseDown={handleSidebarMouseDown}
-          className="cursor-ew-resize bg-transparent"
-          style={{ width: "4px" }}
+          className="cursor-ew-resize bg-transparent fixed top-0 bottom-0"
+          style={{
+            width: "4px",
+            left: `${sidebarWidth}px`,
+            zIndex: 20,
+          }}
         />
       )}
 
@@ -503,8 +507,12 @@ export default function App() {
 
       {/* Main Content - Now includes explore page option */}
       <div
-        className="flex-1 flex flex-col font-sans bg-white"
+        className="flex-1 flex flex-col font-sans bg-white h-screen overflow-auto"
         ref={containerRef}
+        style={{
+          marginLeft: collapsed ? "0" : `${sidebarWidth + 4}px`, // Add margin to accommodate fixed sidebar
+          width: collapsed ? "100%" : `calc(100% - ${sidebarWidth + 4}px)`, // Adjust width to accommodate sidebar
+        }}
       >
         {showWelcome ? (
           <div className="flex-1 flex justify-center">

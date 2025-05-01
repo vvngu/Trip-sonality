@@ -8,15 +8,14 @@ interface SidebarProps {
   onExploreClick: () => void;
 }
 
-const menuItems = [
-  "Chats",
-  "Itinerary",
-  "Saved",
-  "Updates",
-  "Create",
-];
+const menuItems = ["Chats", "Itinerary", "Saved", "Updates", "Create"];
 
-const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat, onExploreClick }) => (
+const Sidebar: React.FC<SidebarProps> = ({
+  width,
+  onToggle,
+  onNewChat,
+  onExploreClick,
+}) => (
   <div
     style={{
       width,
@@ -27,6 +26,10 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat, onExplore
       height: "100vh",
       boxSizing: "border-box",
       fontFamily: "Georgia, serif",
+      position: "fixed", // Make sidebar fixed
+      top: 0,
+      left: 0,
+      zIndex: 10, // Ensure sidebar appears above other content
     }}
   >
     {/* Logo and hide button */}
@@ -70,6 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat, onExplore
         display: "flex",
         flexDirection: "column",
         gap: "2px",
+        overflowY: "auto", // Add scrolling for menu items if needed
       }}
     >
       {menuItems.map((item) => (
@@ -96,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ width, onToggle, onNewChat, onExplore
           {item}
         </button>
       ))}
-      
+
       {/* Special handling for Explore */}
       <button
         onClick={onExploreClick}
