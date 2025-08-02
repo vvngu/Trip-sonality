@@ -7,12 +7,8 @@ from http.client import HTTPException
 from config import client
 from utils import clean_json_content
 from agents.summarize_agent import summarize_agent
-#from agents.search_agent import search_agent
-#from agents.web_content_agent import web_content_agent
 from agents.poi_activity_agent import poi_activity_agent
 from agents.plan_agent import plan_agent
-#from agents.critic_agent import critic_agent
-#from agents.format_agent import format_agent
 
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_agentchat.teams import MagenticOneGroupChat
@@ -28,20 +24,14 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
     # 3 enhanced agents in sequence - now 50% faster, half the API calls, saves 60% cost
     agents=[
         summarize_agent,
-        #search_agent,
-        #web_content_agent,
         poi_activity_agent,
         plan_agent,
-        #critic_agent,
-        #format_agent
+    
     ]
 
-    # Set termination condition: end when format_agent outputs "TERMINATE"
+    # Set termination condition: end when plan_agent outputs valid JSON
     termination = TextMentionTermination(text="TERMINATE")
 
-
-    # 创建 MagenticOneGroupChat 实例
-    # 它会按顺序执行 Agent，并将前一个 Agent 的输出作为下一个 Agent 的输入
     # Create MagenticOneGroupChat instance
     # Executes agents in sequence, passing output from one to the next
     group_chat = MagenticOneGroupChat(
@@ -54,9 +44,8 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
     print(f"--- Initiating Group Chat with Task: {initial_task[:200]}... ---") # 打印部分任务内容
 
     try:
-        # 运行 Agent 流程
-        # 使用 run() 而不是 run_stream() 来获取最终结果
         # Run the agent workflow
+        # Use run() instead of run_stream() to get final result
         final_result = await group_chat.run(task=initial_task)
         messages = final_result.messages
         final_output = None
@@ -114,7 +103,7 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
                         "itinerary": plan_data,
                         "original_request": original_input,  # Pass through original request
                         "extracted_metadata": {
-                            # Let frontend handle extraction, or extract here with simple regex
+                            # Let frontend handle extraction, or extract here with regex
                             "query": original_input.get("Query", ""),
                             "mbti": original_input.get("mbti", ""),
                             "budget": original_input.get("Budget", 0)

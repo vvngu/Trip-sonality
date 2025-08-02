@@ -59,7 +59,7 @@ async def fetch_google_places(query: str, max_results: int = 5) -> List[dict]:
         print(f"Query failed: {query}\nError: {e}")
         return []
 
-# enrichment 用于结构化 web_content_agent 给到的地点
+# enrichment 用于结构化给到的地点
 async def enrich_web_places(web_places: List[str], location: str, max_results_per_place: int = 1) -> List[dict]:
     enriched = []
     seen = set()
