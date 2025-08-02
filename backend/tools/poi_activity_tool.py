@@ -3,6 +3,7 @@ from typing import List, Optional
 import httpx
 import os
 from dotenv import load_dotenv
+from tools.critic_meal_tool import search_nearby_restaurants
 
 load_dotenv()
 
@@ -17,10 +18,10 @@ def build_activity_queries(
     inclusion: Optional[List[str]] = None,
 ) -> List[str]:
     queries = [
-        f"{theme} attractions in {location}",
-        f"{theme} themed experiences in {location}",
-        f"{theme} locations in {location}",
-        f"{theme} experience for {mbti} in {location}",
+        f"{theme} attractions in {location} city",
+        f"{theme} themed experiences in {location} city",
+        f"{theme} locations in {location} city",
+        f"{theme} experience for {mbti} in {location} city",
     ]
 
     if inclusion:
@@ -78,13 +79,14 @@ async def enrich_web_places(web_places: List[str], location: str, max_results_pe
 # 主函数：结合 Google 查询 + Web 抓取地名 enrichment
 async def gather_activity_pois(
     location: str,
-    mbti: str,
+    mbti: str = "",
     theme: str = "culture",
     inclusion: Optional[List[str]] = None,
     web_places: Optional[List[str]] = None,
     max_queries: int = 8,
     max_results_per_query: int = 5
 ) -> List[dict]:
+    print(f"🔍 gather_activity_pois called with: location={location}, theme={theme}, mbti={mbti}")
     queries = build_activity_queries(location, mbti, theme, inclusion)
     seen = set()
     all_results = []
@@ -106,5 +108,65 @@ async def gather_activity_pois(
                 seen.add(poi["place_id"])
                 poi["source"] = "web"
                 all_results.append(poi)
+    # Apply MBTI scoring before returning
+    all_results = apply_mbti_scoring(all_results, mbti)
 
+    # call search_nearby_restaurants for each high rated activity
+    top_activities = sorted(all_results, key=lambda x: x.get('score', 0), reverse=True)[:4]
+
+    for activity in top_activities:  # Use each activity's location
+        nearby_restaurants = await search_nearby_restaurants(
+            activity['lat'],     # Use EACH activity's coordinates
+            activity['lng'], 
+            location, 
+            mbti,
+            max_results=3
+        )
+        # Add restaurants directly to all_results (avoiding duplicates)
+        for restaurant in nearby_restaurants:
+            if restaurant["place_id"] not in seen:
+                seen.add(restaurant["place_id"])
+                all_results.append(restaurant)
+     
+        # Count activities vs restaurants for debug
+    activities_count = len([r for r in all_results if r.get('category') != 'restaurant'])
+    restaurants_count = len([r for r in all_results if r.get('category') == 'restaurant'])
+    
+    print(f"✅ gather_activity_pois returning {len(all_results)} total POIs ({activities_count} activities + {restaurants_count} restaurants)")
     return all_results
+
+def apply_mbti_scoring(pois: List[dict], mbti: str) -> List[dict]:
+    """Apply MBTI-based scoring to POI list"""
+    for poi in pois:
+        rating = poi.get('rating') or 4.0  # Handle None ratings
+        base_score = (rating - 1) * 20  # Convert 1-5 rating to 0-80
+        poi_types = [t.lower() for t in poi.get('types', [])]
+        
+        # MBTI bonuses
+        mbti_bonus = 0
+        
+        # Extrovert vs Introvert
+        if 'E' in mbti:
+            if any(t in poi_types for t in ['shopping_mall', 'amusement_park', 'night_club']):
+                mbti_bonus += 10
+        else:  # Introvert
+            if any(t in poi_types for t in ['library', 'museum', 'park', 'garden']):
+                mbti_bonus += 10
+        
+        # Sensor vs Intuitive  
+        if 'S' in mbti:
+            if any(t in poi_types for t in ['restaurant', 'store', 'market', 'food']):
+                mbti_bonus += 5
+        else:  # Intuitive
+            if any(t in poi_types for t in ['museum', 'art_gallery', 'university']):
+                mbti_bonus += 5
+        
+        # Feeler bonus
+        if 'F' in mbti:
+            if any(t in poi_types for t in ['zoo', 'aquarium', 'park', 'place_of_worship']):
+                mbti_bonus += 5
+        
+        # Final score
+        poi['score'] = min(100, max(60, base_score + mbti_bonus + 10))  # Score between 60-100
+    
+    return pois
