@@ -28,7 +28,7 @@ if not OPENAI_API_KEY:
     raise RuntimeError("请在 .env 文件中设置 OPENAI_API_KEY")
 
 client = OpenAIChatCompletionClient(
-    model=os.getenv("OPENAI_MODEL", "gpt-4o"),
+    model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
     api_key=OPENAI_API_KEY,
     base_url="https://api.openai.com/v1"
 )

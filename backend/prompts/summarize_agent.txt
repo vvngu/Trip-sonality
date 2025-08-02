@@ -12,7 +12,7 @@ Your goal is to validate and summarize the above input into a **structured JSON 
 
 ```json
 {
-  "theme": "<string>",          // inferred or default to "Movie"
+  "theme": "<string>",          // user's requested theme or default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
   "location": "<string>",       // must not be empty; return null if missing
   "days": <int>,               // number of days, e.g., 3
   "start": "<YYYY-MM-DD>",      // optional: inferred or today’s date if missing
@@ -25,7 +25,7 @@ Your goal is to validate and summarize the above input into a **structured JSON 
 3. Instructions:
 
 Parse the free-form "query" text to extract the theme, location, number of days, and any inclusion/exclusion preferences.
-- If "theme" is not mentioned, set it to "Movie".
+- If "theme" is not mentioned, default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
 - If you cannot identify a valid city from the query, return: { "error_type": "invalid_location" }
 - If number of days is not specified, default to 3.
 - If start date is not mentioned, default to today’s date (e.g., "2024-05-01"). Compute end as start + dates - 1 days.

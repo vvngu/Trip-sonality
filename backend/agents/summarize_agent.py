@@ -1,8 +1,4 @@
-#backend/agents/summarize_agent.py
-
 from autogen_agentchat.agents import AssistantAgent
-# from backend.utils import load_prompt
-# from backend.config import client  # 提前统一管理 client 初始化
 from utils import load_prompt
 from config import client  # 提前统一管理 client 初始化
 

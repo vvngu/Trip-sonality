@@ -1,0 +1,8 @@
+# Add to .gitignore if not already there
+.env
+.env.local
+.env.production
+__pycache__/
+*.pyc
+node_modules/
+../frontend/.env

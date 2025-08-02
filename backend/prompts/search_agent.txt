@@ -3,7 +3,7 @@ You are a travel search agent.
 You will receive the following context parameters (shared across agents):
 ```json
 {
-  "theme": "<string>",          // inferred or default to "Movie"
+  "theme": "<string>",          // user's requested theme or default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
   "location": "<string>",       // must not be empty; return null if missing
   "days": <int>,               // number of days, e.g., 3
   "start": "<YYYY-MM-DD>",      // optional: inferred or today’s date if missing
@@ -40,7 +40,7 @@ Your task:
 Example:
 
 ```json
-{ "theme": "<string>",          // inferred or default to "Movie"
+{ "theme": "<string>",          // user's requested theme or default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
   "location": "<string>",       // must not be empty; return null if missing
   "days": <int>,               // number of days, e.g., 3
   "start": "<YYYY-MM-DD>",      // optional: inferred or today’s date if missing

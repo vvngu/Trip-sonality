@@ -13,18 +13,19 @@ PLACES_ENDPOINT = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 def build_activity_queries(
     location: str,
     mbti: str,
+    theme: str = "culture",
     inclusion: Optional[List[str]] = None,
 ) -> List[str]:
     queries = [
-        f"movie attractions in {location}",
-        f"movie themed experiences in {location}",
-        f"movie filming locations in {location}",
-        f"movie experience for {mbti} in {location}",
+        f"{theme} attractions in {location}",
+        f"{theme} themed experiences in {location}",
+        f"{theme} locations in {location}",
+        f"{theme} experience for {mbti} in {location}",
     ]
 
     if inclusion:
         for inc in inclusion:
-            queries.append(f"{inc} in {location} related to movies")
+            queries.append(f"{inc} in {location} related to {theme}")
     return queries
 
 # 基础搜索调用 Google Places Text Search API
@@ -78,12 +79,13 @@ async def enrich_web_places(web_places: List[str], location: str, max_results_pe
 async def gather_activity_pois(
     location: str,
     mbti: str,
+    theme: str = "culture",
     inclusion: Optional[List[str]] = None,
     web_places: Optional[List[str]] = None,
     max_queries: int = 8,
     max_results_per_query: int = 5
 ) -> List[dict]:
-    queries = build_activity_queries(location, mbti, inclusion)
+    queries = build_activity_queries(location, mbti, theme, inclusion)
     seen = set()
     all_results = []
 
