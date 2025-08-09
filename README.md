@@ -90,8 +90,8 @@ npm run dev
 
 Trip-sonality uses a collaborative AI agent system to create personalized itineraries:
 
-1. **Summarize Agent**: Analyzes MBTI traits and preferences
-2. **POI Activity Agent**: Gathers destination information, Collects detailed POI data, Identifies personality-matching places and activities
+1. **Summarize Agent**: Utilizes natural language processing to extract structured preferences and constraints from user input 
+2. **POI Activity Agent**: Gathers destination information, Collects detailed POI data, Analyzes MBTI traits and preferences
 3. **Plan Agent**: Creates coherent day-by-day itineraries, Reviews for consistency with user preferences, Produces the final polished itinerary
 
 Our multi-agent architecture is inspired by the [AutoGen MagentiCone design pattern](https://github.com/Azure-Samples/python-ai-agent-frameworks-demos/blob/main/autogen_magenticone.py) from Azure Samples' AI agent frameworks. This pattern enables sophisticated group chat interactions between specialized agents, allowing them to collaborate on complex tasks while maintaining distinct roles and responsibilities.
