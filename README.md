@@ -1,7 +1,6 @@
 # Trip-sonality
 
 A personalized travel planning application designed for solo travelers based on MBTI personality types, travel preferences, and budget constraints.
-[Demo Videos of out Project Here](https://youtu.be/ZaacbkefUq0)
 
 ## About Trip-sonality
 
@@ -11,9 +10,9 @@ Trip-sonality is a unique travel planning platform that goes beyond generic itin
 
 - **MBTI-Based Recommendations**: Tailored suggestions based on your personality type
 - **Budget-Conscious Planning**: All recommendations respect your financial parameters
-- **Themed Journeys**: Currently supporting movie-themed trips with more themes coming soon
+- **Themed Journeys**: Currently supporting themed based trips
 - **Interactive Maps**: Visualize your journey with an intuitive map interface
-- **AI-Powered Personalization**: Seven specialized AI agents collaborate to craft your perfect itinerary
+- **AI-Powered Personalization**: 3 specialized AI agents collaborate to craft your perfect itinerary
 - **Calendar Integration**: Easily add your trip to your personal calendar
 - **Explore Community Trips**: Browse publicly shared itineraries for inspiration
 
@@ -92,12 +91,8 @@ npm run dev
 Trip-sonality uses a collaborative AI agent system to create personalized itineraries:
 
 1. **Summarize Agent**: Analyzes MBTI traits and preferences
-2. **Search Agent**: Gathers destination information
-3. **Web Content Agent**: Collects detailed POI data
-4. **POI Activity Agent**: Identifies personality-matching places and activities
-5. **Plan Agent**: Creates coherent day-by-day itineraries
-6. **Critic Agent**: Reviews for consistency with user preferences
-7. **Format Agent**: Produces the final polished itinerary
+2. **POI Activity Agent**: Gathers destination information, Collects detailed POI data, Identifies personality-matching places and activities
+3. **Plan Agent**: Creates coherent day-by-day itineraries, Reviews for consistency with user preferences, Produces the final polished itinerary
 
 Our multi-agent architecture is inspired by the [AutoGen MagentiCone design pattern](https://github.com/Azure-Samples/python-ai-agent-frameworks-demos/blob/main/autogen_magenticone.py) from Azure Samples' AI agent frameworks. This pattern enables sophisticated group chat interactions between specialized agents, allowing them to collaborate on complex tasks while maintaining distinct roles and responsibilities.
 
@@ -105,19 +100,17 @@ Our multi-agent architecture is inspired by the [AutoGen MagentiCone design patt
 
 1. **Select your MBTI personality type** - This helps us understand your travel style
 2. **Set your budget** - Ensures recommendations match your financial parameters
-3. **Choose a theme** - Currently supporting movie-themed trips
+3. **Choose a theme** - Input an optional theme for your trip
 4. **Select your destination** - Where would you like to explore?
 5. **Define trip duration** - How many days will you be traveling?
-6. **Chat about your preferences** - Tell us what you like and dislike
+6. **Chat about your preferences** - Share your likes/dislikes or anything you would like to include or avoid
 7. **Generate your itinerary** - Our AI agents will create your personalized plan
 8. **Explore and refine** - Browse your recommendations and provide feedback
 9. **Share or save to calendar** - Export your final itinerary
 
 ## The Story Behind Trip-sonality
 
-Trip-sonality was born from our team member Emma's frustrating experience with mainstream travel planners. As an INFJ who values meaningful cultural experiences over tourist hotspots, she found existing platforms created generic, impersonal itineraries that didn't account for her introvert energy levels or respect her budget constraints.
-
-We built Trip-sonality to solve these pain points by creating deeply personalized travel experiences that reflect not just where you want to go, but how you prefer to experience the world.
+In an era where digital services are rapidly advancing toward hyper-personalization, travel planning remains a space where individual experiences are often overlooked. Traditional recommendation systems typically focus on surface-level interests, failing to truly reflect the uniqueness of each traveler. To address this gap, Trip-sonality introduces a travel planning platform that integrates MBTI personality types with budget, duration, interests, and themes to generate deeply personalized itineraries.
 
 ## Contributing
 
