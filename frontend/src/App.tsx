@@ -212,7 +212,7 @@ export default function App() {
   ]);
   const [detailResult, setDetailResult] = useState<any>(null);
   const [themeInput, setThemeInput] = useState<string>("Movie");
-  const [locationInput, setLocationInput] = useState<string>("Los Angeles");
+  const [locationInput, setLocationInput] = useState<string>("");
   const [datesInput, setDatesInput] = useState<string>("6");
   const [mbti, setMbti] = useState<MBTI>("INFJ");
   const [budget, setBudget] = useState<string>("1500 USD");
