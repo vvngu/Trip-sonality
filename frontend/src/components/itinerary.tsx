@@ -1,86 +1,27 @@
 import React, { useState, useRef, useEffect } from "react";
 
-// 6-day placeholder itinerary for a Los Angeles movie-themed trip
+// Generic placeholder itinerary - will be replaced with API data
 export const placeholderItinerary = [
   {
     day: "Day 1",
-    food: { time: "12:00 PM", place: "Grand Central Market", cost: "$25" },
+    food: { time: "12:00 PM", place: "Local Restaurant", cost: "$25", lat: 0, lng: 0 },
     activities: [
       {
         time: "2:00 PM (2h)",
-        place: "Hollywood Walk of Fame",
-        cost: "$0",
+        place: "Popular Attraction",
+        cost: "$20",
+        lat: 0,
+        lng: 0,
       },
-      { time: "5:00 PM (2h)", place: "TCL Chinese Theatre", cost: "$20" },
-    ],
-    summary:
-      "Kick off your LA movie-themed trip with tasty street food and a stroll among the stars.",
-  },
-  {
-    day: "Day 2",
-    food: { time: "1:00 PM", place: "In-N-Out Burger", cost: "$15" },
-    activities: [
-      { time: "2:30 PM (2h)", place: "Griffith Observatory", cost: "$15" },
-      { time: "6:00 PM (2h)", place: "Hollywood Bowl Tour", cost: "$30" },
-    ],
-    summary:
-      "Enjoy a classic California burger, then catch panoramic city views and a behind-the-scenes music venue tour.",
-  },
-  {
-    day: "Day 3",
-    food: { time: "11:30 AM", place: "Grandma's Café", cost: "$20" },
-    activities: [
-      {
-        time: "1:00 PM (2h)",
-        place: "Universal Studios Backlot Tour",
-        cost: "$30",
-      },
-      { time: "4:00 PM (2h)", place: "CityWalk Exploration", cost: "$0" },
-    ],
-    summary:
-      "Taste homey brunch fare before exploring iconic movie sets and entertainment district vibes.",
-  },
-  {
-    day: "Day 4",
-    food: { time: "12:00 PM", place: "Shake Shack", cost: "$18" },
-    activities: [
-      { time: "1:30 PM (2h)", place: "Getty Center Tour", cost: "$20" },
-      {
-        time: "5:00 PM (2h)",
-        place: "Sunset Boulevard Drive",
-        cost: "$0",
+      { 
+        time: "5:00 PM (2h)", 
+        place: "Cultural Site", 
+        cost: "$15",
+        lat: 0,
+        lng: 0,
       },
     ],
-    summary:
-      "Grab a casual shake, then enjoy art, architecture, and a scenic drive into movie history.",
-  },
-  {
-    day: "Day 5",
-    food: { time: "1:00 PM", place: "Venice Beach Snack Stand", cost: "$12" },
-    activities: [
-      {
-        time: "2:00 PM (2h)",
-        place: "Venice Beach Skateboarders",
-        cost: "$0",
-      },
-      { time: "5:00 PM (2h)", place: "Santa Monica Pier", cost: "$10" },
-    ],
-    summary:
-      "Soak up beach culture with tasty snacks, street performances, and a seaside amusement experience.",
-  },
-  {
-    day: "Day 6",
-    food: { time: "1:00 PM", place: "The Grove Food Court", cost: "$20" },
-    activities: [
-      {
-        time: "2:30 PM (2h)",
-        place: "Warner Bros. Studio Tour",
-        cost: "$50",
-      },
-      { time: "5:00 PM (2h)", place: "Downtown Art District", cost: "$0" },
-    ],
-    summary:
-      "End with a gourmet food hall meal and an immersive peek behind your favorite films, capped by local art browsing.",
+    summary: "Start your adventure with local cuisine and explore the main attractions of your destination.",
   },
 ] as const;
 
