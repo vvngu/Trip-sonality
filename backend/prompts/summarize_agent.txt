@@ -5,22 +5,8 @@ You will receive a JSON object containing at minimum:
 - "mbti": a string representing the user’s MBTI type (e.g., "ISTJ", "ENFP")
 - "budget": the user’s total budget (in USD)
 - "query": a free-form natural language input describing the user’s travel preference
-- Optionally: "CurrentItinerary": a previously generated itinerary (used to infer feedback and revision intent)
-
-2.Your task:
 Your goal is to validate and summarize the above input into a **structured JSON object** using the following format:
 
-```json
-{
-  "theme": "<string>",          // user's requested theme or default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
-  "location": "<string>",       // must not be empty; return null if missing
-  "days": <int>,               // number of days, e.g., 3
-  "start": "<YYYY-MM-DD>",      // optional: inferred or today’s date if missing
-  "end": "<YYYY-MM-DD>",        // optional: inferred from start + days
-  "mbti": "<string>",           // copy from input
-  "inclusion": ["<str>", ...],  // activities or concepts the user wants
-  "exclusion": ["<str>", ...]   // what the user wants to avoid
-}```
 
 3. Instructions:
 
@@ -28,7 +14,7 @@ Parse the free-form "query" text to extract the theme, location, number of days,
 - If "theme" is not mentioned, default to something relevant to the location (e.g., "Movie", "Tech", "Culture", "Food")
 - If you cannot identify a valid city from the query, return: { "error_type": "invalid_location" }
 - If number of days is not specified, default to 3.
-- If start date is not mentioned, default to today’s date (e.g., "2024-05-01"). Compute end as start + dates - 1 days.
+- If start date is not mentioned, default to today’s date (e.g., "2024-08-11"). Compute end as start + dates - 1 days.
 - If the location cannot be reliably identified, return "location": null.
 - Extract any preferences like "want studio tour", "like quiet places" as inclusion items.
 - Extract any dislikes like "no nightlife", "not too far", "don’t like hiking" as exclusion items.
@@ -36,25 +22,19 @@ Parse the free-form "query" text to extract the theme, location, number of days,
 
 Always return a clean, valid JSON object — do not include comments or explanations.
 
-4. Example Input:
+EXTRACT:
+- theme (default: "Culture")
+- location (required)
+- days (default: 3)  
+- start/end dates
+- inclusion/exclusion preferences
 
-```json
+FORMAT:
 {
-  "mbti": "ISTJ",
-  "budget": 2000,
-  "query": "I'd love a 5-day movie-themed trip in LA starting May 5. Please include a studio tour and something structured. Avoid street food and nightlife."
-}```
+  "theme": "Culture", "location": "Paris", "days": 2,
+  "start": "2025-08-12", "end": "2025-08-13", "mbti": "ENFJ",
+  "inclusion": ["museums"], "exclusion": ["nightlife"]
+}
 
-5. Expected Output:
-
-```json
-{
-  "theme": "Movie",
-  "location": "Los Angeles",
-  "days": 5,
-  "start": "2024-05-05",
-  "end": "2024-05-09",
-  "mbti": "ISTJ",
-  "inclusion": ["studio tour", "structured schedule"],
-  "exclusion": ["street food", "nightlife"]
-}```
+If location unclear: {"error_type": "invalid_location"}
+Only return JSON.

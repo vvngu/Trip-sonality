@@ -12,28 +12,40 @@ import WelcomePage from "./components/WelcomePage";
 import ShareModal from "./components/ShareModal";
 import SampleGuides from "./components/sampleGuides";
 
- function transformBackendData(backendData: any) {
-  // Handle backend's nested structure: data.itinerary.itinerary
-  const days = backendData?.data?.itinerary || [];
-  
-  return days.map((day: any) => ({
-    day: day.day,
-    food: {
-      time: "12:00 PM",
-      place: "Local Restaurant",
-      cost: "$25",
-      lat: day.activities[0]?.poi?.lat || 0,
-      lng: day.activities[0]?.poi?.lng || 0
-    },
-    activities: day.activities.map((activity: any) => ({
-      time: activity.time,
-      place: activity.poi.name,  // poi.name -> place
-      cost: activity.poi.price_level ? `$${activity.poi.price_level * 15}` : "$20",
-      lat: activity.poi.lat,
-      lng: activity.poi.lng
-    })),
-    summary: `Explore ${backendData.itinerary?.location || locationInput} with amazing ${backendData.itinerary?.theme || themeInput} experiences!`
-  }));
+// Transform backend POI format to frontend format
+function transformBackendData(
+  backendItinerary: any[], 
+  location: string, 
+  theme: string
+): ItineraryDay[] {
+  return backendItinerary.map(day => {
+    // Separate restaurants from activities
+    const restaurants = day.activities.filter((activity: any) => 
+      activity.poi.types.includes("restaurant")
+    );
+    const activities = day.activities.filter((activity: any) => 
+      !activity.poi.types.includes("restaurant")
+    );
+
+    return {
+      day: day.day,
+      food: {
+        time: restaurants[0]?.time || "12:00 PM",
+        place: restaurants[0]?.poi.name || "Local Restaurant", 
+        cost: "$25",
+        lat: restaurants[0]?.poi.lat || 0,
+        lng: restaurants[0]?.poi.lng || 0
+      },
+      activities: activities.map((activity: any) => ({
+        time: activity.time,
+        place: activity.poi.name,
+        cost: "$20",
+        lat: activity.poi.lat,
+        lng: activity.poi.lng
+      })),
+      summary: `Explore ${location} with amazing ${theme} experiences!`
+    };
+  });
 }
 
 // Simplified event attributes interface for ics
@@ -195,37 +207,6 @@ const budgetOptionsSelect: BudgetOption[] = [
   "2500+ USD",
 ].map((b) => ({ value: b, label: b }));
 
-// Transform backend POI format to frontend format
-function transformBackendData(backendItinerary: any[]): ItineraryDay[] {
-  return backendItinerary.map(day => {
-    // Separate restaurants from activities
-    const restaurants = day.activities.filter((activity: any) => 
-      activity.poi.types.includes("restaurant")
-    );
-    const activities = day.activities.filter((activity: any) => 
-      !activity.poi.types.includes("restaurant")
-    );
-
-    return {
-      day: day.day,
-      food: {
-        time: restaurants[0]?.time || "12:00 PM",
-        place: restaurants[0]?.poi.name || "Local Restaurant", 
-        cost: "$25",
-        lat: restaurants[0]?.poi.lat || 0,
-        lng: restaurants[0]?.poi.lng || 0
-      },
-      activities: activities.map((activity: any) => ({
-        time: activity.time,
-        place: activity.poi.name,
-        cost: "$20",
-        lat: activity.poi.lat,
-        lng: activity.poi.lng
-      })),
-      summary: "Explore the best of the city today."
-    };
-  });
-}
 
 export default function App() {
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([
@@ -351,46 +332,47 @@ export default function App() {
       })
       .then((data) => {
         console.log("API response received:", data);
-  
-        // Store session ID
+      
         if (data.session_id) {
           setSessionId(data.session_id);
         }
-  
-        // Handle the backend response structure: data.data.itinerary
-        if (data.data && data.data.itinerary) {
-          const backendItinerary = data.data.itinerary;  // This is the array
-          
-          // Transform backend format to frontend format
-          const transformedItinerary = transformBackendData(backendItinerary);
-          setItinerary(transformedItinerary);
-  
-          // Extract locations for map
-          const locationData = extractLocationsFromItinerary(transformedItinerary);
-          setLocations(locationData);
-          console.log("Extracted location data:", locationData);
-          
-          console.log("Backend data transformed successfully");
-        } else {
-          console.warn("API returned unexpected data format:", data);
-          console.log("Expected: data.data.itinerary, Received:", {
-            hasData: !!data.data,
-            dataKeys: data.data ? Object.keys(data.data) : [],
-            itineraryExists: !!(data.data && data.data.itinerary)
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("Request error:", err);
-        alert("Failed to retrieve itinerary, please try again later");
-      })
-      .finally(() => {
-        setIsLoading(false);
-        setIsLocked(true);
-        setFieldInput("");
-      });
-  };
+      
+        // Access the nested structure correctly
+        if (data.data && data.data.itinerary && data.data.itinerary.itinerary) {
+          const backendItinerary = data.data.itinerary.itinerary;  // The actual array
+          const apiResponse = data.data.itinerary; // Get metadata
+    
+       // Transform with location/theme from API response
+      const transformedItinerary = transformBackendData(
+        backendItinerary, 
+        apiResponse.location || locationInput,
+        apiResponse.theme || themeInput
+      );
+      setItinerary(transformedItinerary);
 
+      // Update UI with actual values from backend
+      setThemeInput(apiResponse.theme || themeInput);
+      setLocationInput(apiResponse.location || locationInput); 
+      setDatesInput(apiResponse.days ? apiResponse.days.toString() : datesInput);
+    
+      // Extract locations for map
+     const locationData = extractLocationsFromItinerary(transformedItinerary);
+     setLocations(locationData);
+     console.log("✅ Integration successful!");
+  } else {
+    console.warn("Unexpected data format:", data);
+  }
+  })
+  .catch((err) => {
+    console.error("Request error:", err);
+    alert("Failed to retrieve itinerary, please try again later");
+  })
+  .finally(() => {
+    setIsLoading(false);
+    setIsLocked(true);
+    setFieldInput("");
+  });
+};
   // Save welcome state to localStorage when it changes
   useEffect(() => {
     localStorage.setItem("showWelcome", JSON.stringify(showWelcome));
