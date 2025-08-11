@@ -3,7 +3,6 @@ import json
 import os 
 from typing import List, Dict, Any
 from http.client import HTTPException
-
 from config import client
 from utils import clean_json_content
 from agents.summarize_agent import summarize_agent
@@ -37,14 +36,15 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
     group_chat = MagenticOneGroupChat(
         agents,
         termination_condition=termination,
-        model_client=client, # 可以为 group chat 本身指定一个 client，用于管理流程
+        model_client=client,
     )
 
     initial_task = json.dumps(initial_user_input)
-    print(f"--- Initiating Group Chat with Task: {initial_task[:200]}... ---") # 打印部分任务内容
+    print(f"--- Initiating Group Chat with Task: {initial_task[:200]}... ---")
 
     try:
         # Run the agent workflow
+        # Use run() instead of run_stream() to get final result
         # Use run() instead of run_stream() to get final result
         final_result = await group_chat.run(task=initial_task)
         messages = final_result.messages
@@ -125,16 +125,15 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
         return final_output
         
     except HTTPException as he:
-        # 透传 summarize_agent 抛出的 HTTP 异常 (例如无效地点)
+        # Pass through HTTP exceptions from summarize_agent (e.g. invalid location)
         raise he
     except Exception as e:
         print(f"--- AutoGen Workflow Error: {e} ---")
-        # 可以根据需要进行更细致的错误处理
         raise Exception(f"An error occurred during the itinerary generation: {e}")
 
 
-# --- 主程序入口 (示例) ---
-# 通常这个函数会由 app.py 调用
+# --- Main program entry (example) ---
+# Usually this function would be called by app.py
 async def main_test():
     """Local test run function"""
     test_input = {
