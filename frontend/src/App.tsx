@@ -3,39 +3,17 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "./components/sidebar";
 import { MapView } from "./components/map-view";
 import { ChatHeader } from "./components/chat-header";
+// import Itinerary from "./components/itinerary";
 import Itinerary, {
   placeholderItinerary,
   ItineraryDay,
 } from "./components/itinerary";
 import Select, { SingleValue } from "react-select";
 import { FiShare2, FiCalendar } from "react-icons/fi";
+// import { FaSignInAlt } from "react-icons/fa";
 import WelcomePage from "./components/WelcomePage";
 import ShareModal from "./components/ShareModal";
 import SampleGuides from "./components/sampleGuides";
-
- function transformBackendData(backendData: any) {
-  // Handle backend's nested structure: data.itinerary.itinerary
-  const days = backendData?.data?.itinerary || [];
-  
-  return days.map((day: any) => ({
-    day: day.day,
-    food: {
-      time: "12:00 PM",
-      place: "Local Restaurant",
-      cost: "$25",
-      lat: day.activities[0]?.poi?.lat || 0,
-      lng: day.activities[0]?.poi?.lng || 0
-    },
-    activities: day.activities.map((activity: any) => ({
-      time: activity.time,
-      place: activity.poi.name,  // poi.name -> place
-      cost: activity.poi.price_level ? `$${activity.poi.price_level * 15}` : "$20",
-      lat: activity.poi.lat,
-      lng: activity.poi.lng
-    })),
-    summary: `Explore ${backendData.itinerary?.location || locationInput} with amazing ${backendData.itinerary?.theme || themeInput} experiences!`
-  }));
-}
 
 // Simplified event attributes interface for ics
 interface EventAttr {
@@ -337,19 +315,20 @@ export default function App() {
       .then((data) => {
         console.log("收到API响应：", data);
 
-        if (data.success && data.itinerary) {                
-          // Transform backend data to frontend format
-          const transformedData = transformBackendData(data);
-          console.log("✅ Original backend data:", data);
-          console.log("✅ Transformed data:", transformedData);
-          console.log("✅ Number of days:", transformedData.length);
+        // 存储会话ID
+        if (data.session_id) {
+          setSessionId(data.session_id);
+        }
 
-          setItinerary(transformedData);  
-          // Extract locations for map from transformed data
-          const locationData = extractLocationsFromItinerary(transformedData); // ✅ NEW: Use transformed
+        // 处理数据
+        if (data.data && Array.isArray(data.data)) {
+          // 设置行程数据
+          setItinerary(data.data);
+
+          // 从数据中提取位置信息用于地图
+          const locationData = extractLocationsFromItinerary(data.data);
           setLocations(locationData);
           console.log("提取的位置数据:", locationData);
-          console.log("Backend data transformed successfully");
         } else {
           console.warn("API返回的数据格式不符合预期:", data);
         }

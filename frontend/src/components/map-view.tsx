@@ -8,7 +8,7 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 
-// 添加自定义位置数据接口
+// add personalized location data api
 interface LocationData {
   name: string;
   position: {
@@ -25,103 +25,32 @@ interface ItineraryLocation {
 
 interface MapViewProps {
   highlightedPlace?: string;
-  // 添加可选的locations参数
+  // add optional location params
   locations?: LocationData[];
 }
 
-// Los Angeles coordinates
-const losAngelesCoordinates = { lat: 34.0522, lng: -118.2437 };
+// Default center coordinates (world center) - used only as absolute fallback
+const defaultCenterCoordinates = { lat: 0, lng: 0 };
 
-// Expanded itinerary locations with more places (作为备用数据)
-const itineraryLocations = [
-  { id: 1, name: "Hollywood Sign", position: { lat: 34.1341, lng: -118.3215 } },
-  {
-    id: 2,
-    name: "Santa Monica Pier",
-    position: { lat: 34.0095, lng: -118.4912 },
-  },
-  {
-    id: 3,
-    name: "Griffith Observatory",
-    position: { lat: 34.1184, lng: -118.3004 },
-  },
-  { id: 4, name: "Venice Beach", position: { lat: 33.985, lng: -118.4695 } },
-  {
-    id: 5,
-    name: "Grand Central Market",
-    position: { lat: 34.0509, lng: -118.2494 },
-  },
-  {
-    id: 6,
-    name: "Hollywood Walk of Fame",
-    position: { lat: 34.1016, lng: -118.3267 },
-  },
-  {
-    id: 7,
-    name: "TCL Chinese Theatre",
-    position: { lat: 34.1022, lng: -118.341 },
-  },
-  {
-    id: 8,
-    name: "In-N-Out Burger",
-    position: { lat: 34.0981, lng: -118.3375 },
-  },
-  {
-    id: 9,
-    name: "Hollywood Bowl",
-    position: { lat: 34.1127, lng: -118.3392 },
-  },
-  {
-    id: 10,
-    name: "Universal Studios",
-    position: { lat: 34.1381, lng: -118.3534 },
-  },
-  {
-    id: 11,
-    name: "Grandma's Café",
-    position: { lat: 34.0771, lng: -118.2528 },
-  },
-  {
-    id: 12,
-    name: "CityWalk",
-    position: { lat: 34.1373, lng: -118.3526 },
-  },
-  {
-    id: 13,
-    name: "Shake Shack",
-    position: { lat: 34.0977, lng: -118.3264 },
-  },
-  {
-    id: 14,
-    name: "Getty Center",
-    position: { lat: 34.0776, lng: -118.4741 },
-  },
-  {
-    id: 15,
-    name: "Sunset Boulevard",
-    position: { lat: 34.0967, lng: -118.3425 },
-  },
-  {
-    id: 16,
-    name: "Venice Beach Snack Stand",
-    position: { lat: 33.9858, lng: -118.4725 },
-  },
-  {
-    id: 17,
-    name: "Warner Bros. Studio",
-    position: { lat: 34.1538, lng: -118.3371 },
-  },
-  {
-    id: 18,
-    name: "Downtown Art District",
-    position: { lat: 34.0403, lng: -118.2351 },
-  },
-  {
-    id: 19,
-    name: "The Grove Food Court",
-    position: { lat: 34.0725, lng: -118.3576 },
-  },
-];
+// Helper function to calculate geographic center from locations
+const calculateCenter = (locations: LocationData[]): { lat: number; lng: number } => {
+  if (!locations || locations.length === 0) {
+    return defaultCenterCoordinates;
+  }
+
+  const sum = locations.reduce(
+    (acc, loc) => ({
+      lat: acc.lat + loc.position.lat,
+      lng: acc.lng + loc.position.lng,
+    }),
+    { lat: 0, lng: 0 }
+  );
+
+  return {
+    lat: sum.lat / locations.length,
+    lng: sum.lng / locations.length,
+  };
+};
 
 // Create a separate file called react-app-env.d.ts in the src directory with this content:
 // /// <reference types="react-scripts" />
@@ -141,18 +70,18 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations })
     libraries: ["places"],
   });
 
-  // 将API返回的locations转换为可用的标记点数据
+  // Convert API locations to map marker data
   const mapLocations = useMemo(() => {
     if (locations && locations.length > 0) {
-      // 使用API返回的locations数据
+      // Use API response locations data
       return locations.map((loc, index) => ({
         id: index + 1,
         name: loc.name,
         position: loc.position
       }));
     } else {
-      // 使用默认的itineraryLocations数据
-      return itineraryLocations;
+      // Return empty array if no locations available
+      return [];
     }
   }, [locations]);
 
@@ -184,22 +113,27 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations })
     []
   );
 
-  // Determine center: prioritize selectedLoc, then highlightedPlace, else default
+  // Determine center: prioritize selectedLoc, then highlightedPlace, then calculated center, else default
   const center = useMemo(() => {
-    // 首先查找当前选中的位置
+    // First, check for currently selected location
     if (selectedLoc?.position) {
       return selectedLoc.position;
     }
     
-    // 然后查找高亮显示的地点
+    // Then check for highlighted place
     const highlightedLoc = mapLocations.find(loc => loc.name === highlightedPlace);
     if (highlightedLoc) {
       return highlightedLoc.position;
     }
     
-    // 最后使用默认位置
-    return losAngelesCoordinates;
-  }, [selectedLoc, highlightedPlace, mapLocations]);
+    // Calculate center from available locations
+    if (mapLocations.length > 0) {
+      return calculateCenter(locations || []);
+    }
+    
+    // Absolute fallback to default coordinates
+    return defaultCenterCoordinates;
+  }, [selectedLoc, highlightedPlace, mapLocations, locations]);
 
   // Now we can safely do conditional returns after all hooks are called
   if (loadError) return <div>Error loading map</div>;
