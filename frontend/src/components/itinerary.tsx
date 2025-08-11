@@ -81,7 +81,7 @@ export default function Itinerary({
   };
 
   const moveToNext = () => {
-    if (currentIndex < placeholderItinerary.length - 1) {
+    if (currentIndex < itinerary.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setDirection("left");
     }
