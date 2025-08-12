@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       display: "flex",
       flexDirection: "column",
       backgroundColor: "white",
-      borderRight: "2px solid #d1d5db", // 更粗灰色边框
+      borderRight: "2px solid #d1d5db", 
       height: "100vh",
       boxSizing: "border-box",
       fontFamily: "Georgia, serif",
@@ -91,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#f9fafb"; // hover 浅灰
+            e.currentTarget.style.backgroundColor = "#f9fafb"; // hover
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = "white";
@@ -134,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           width: "100%",
           padding: "12px 8px",
           fontSize: "16px",
-          backgroundColor: "#f3f4f6", // 灰色背景
+          backgroundColor: "#f3f4f6", 
           // borderRadius: "6px",
           border: "1px solid #d1d5db",
           cursor: "pointer",

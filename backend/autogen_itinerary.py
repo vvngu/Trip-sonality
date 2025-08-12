@@ -45,7 +45,6 @@ async def run_autogen_workflow(initial_user_input: Dict[str, Any]) -> Dict[str, 
     try:
         # Run the agent workflow
         # Use run() instead of run_stream() to get final result
-        # Use run() instead of run_stream() to get final result
         final_result = await group_chat.run(task=initial_task)
         messages = final_result.messages
         final_output = None

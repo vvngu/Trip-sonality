@@ -46,12 +46,10 @@ def clean_html_from_url(url: str) -> str:
     try:
         resp = requests.get(url, timeout=10)
         soup = BeautifulSoup(resp.text, "html.parser")
-
-        # 只提取有结构含义的部分（不含正文长文段）
         items = soup.find_all(["li", "h2", "strong", "b"])
         lines = [item.get_text(strip=True) for item in items if item.get_text()]
         text = "\n".join(lines)
-        return text[:1500]  # 控制总长度
+        return text[:1500]
     except Exception as e:
         print(f"[clean_html_from_url] Parse error: {e}")
         return ""

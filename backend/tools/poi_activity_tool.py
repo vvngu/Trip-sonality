@@ -10,7 +10,6 @@ load_dotenv()
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 PLACES_ENDPOINT = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-# 构造活动相关的搜索 query（始终围绕电影主题）
 def build_activity_queries(
     location: str,
     mbti: str,
@@ -29,7 +28,7 @@ def build_activity_queries(
             queries.append(f"{inc} in {location} related to {theme}")
     return queries
 
-# 基础搜索调用 Google Places Text Search API
+# Google Places Text Search API
 async def fetch_google_places(query: str, max_results: int = 5) -> List[dict]:
     params = {
         "query": query,
@@ -59,7 +58,6 @@ async def fetch_google_places(query: str, max_results: int = 5) -> List[dict]:
         print(f"Query failed: {query}\nError: {e}")
         return []
 
-# enrichment 用于结构化给到的地点
 async def enrich_web_places(web_places: List[str], location: str, max_results_per_place: int = 1) -> List[dict]:
     enriched = []
     seen = set()
@@ -76,7 +74,7 @@ async def enrich_web_places(web_places: List[str], location: str, max_results_pe
 
     return enriched
 
-# 主函数：结合 Google 查询 + Web 抓取地名 enrichment
+# Main function: combining Google query + web crawling place name enrichment
 async def gather_activity_pois(
     location: str,
     mbti: str = "",
@@ -91,7 +89,6 @@ async def gather_activity_pois(
     seen = set()
     all_results = []
 
-    # Google 构造查询部分
     for query in queries[:max_queries]:
         pois = await fetch_google_places(query, max_results=max_results_per_query)
         for poi in pois:
@@ -100,7 +97,7 @@ async def gather_activity_pois(
                 poi["source"] = "api"
                 all_results.append(poi)
 
-    # web_content enrichment 部分
+    # web_content enrichment
     if web_places:
         web_results = await enrich_web_places(web_places, location)
         for poi in web_results:
@@ -128,7 +125,7 @@ async def gather_activity_pois(
                 seen.add(restaurant["place_id"])
                 all_results.append(restaurant)
      
-        # Count activities vs restaurants for debug
+     # Count activities vs restaurants for debug
     activities_count = len([r for r in all_results if r.get('category') != 'restaurant'])
     restaurants_count = len([r for r in all_results if r.get('category') == 'restaurant'])
     

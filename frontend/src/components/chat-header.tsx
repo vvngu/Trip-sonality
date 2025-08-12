@@ -10,11 +10,8 @@ interface ChatHeaderProps {
   onDatesChange: (value: string) => void;
   isLocked?: boolean; // New prop to determine if fields are locked
 }
-
-// 主题选项
 const themeOptions = [{ value: "Movie", label: "Movie" }];
 
-// 自定义样式以匹配现有UI
 const customSelectStyles = {
   control: (base: any) => ({
     ...base,
@@ -58,7 +55,7 @@ const customSelectStyles = {
     fontWeight: "500",
     fontSize: "0.875rem",
     width: "100%",
-    zIndex: 9999, // 增加z-index确保下拉框不被其他元素遮挡
+    zIndex: 9999,
   }),
   menuList: (base: any) => ({
     ...base,
@@ -86,7 +83,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onThemeChange,
   onLocationChange,
   onDatesChange,
-  isLocked = false, // Default to false if not provided
+  isLocked = false,
 }) => (
   <div className="grid grid-cols-3 gap-2 mb-4 border border-gray-200 rounded-lg overflow-hidden">
     <div className="p-3 border-r border-gray-200 flex items-center space-x-2">
