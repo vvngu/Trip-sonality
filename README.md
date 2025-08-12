@@ -16,6 +16,9 @@ Trip-sonality is a unique travel planning platform that goes beyond generic itin
 - **Calendar Integration**: Easily add your trip to your personal calendar
 - **Explore Community Trips**: Browse publicly shared itineraries for inspiration
 
+## The Story Behind Trip-sonality
+In an era where digital services are rapidly advancing toward hyper-personalization, travel planning remains a space where individual experiences are often overlooked. Traditional recommendation systems typically focus on surface-level interests, failing to truly reflect the uniqueness of each traveler. To address this gap, Trip-sonality introduces a travel planning platform that integrates MBTI personality types with budget, duration, interests, and themes to generate deeply personalized itineraries.
+
 ## Getting Started
 
 ### Prerequisites
@@ -108,15 +111,6 @@ Our multi-agent architecture is inspired by the [AutoGen MagentiCone design patt
 8. **Explore and refine** - Browse your recommendations and provide feedback
 9. **Share or save to calendar** - Export your final itinerary
 
-## The Story Behind Trip-sonality
-
-Trip-sonality was born from our team member's frustrating experience with mainstream travel planners. As an INFJ who values meaningful cultural experiences over tourist hotspots, she found existing platforms created generic, impersonal itineraries that didn't account for her introvert energy levels or respect her budget constraints.
-
-We built Trip-sonality to solve these pain points by creating deeply personalized travel experiences that reflect not just where you want to go, but how you prefer to experience the world.
-
-## Contributing
-
-We welcome contributions to Trip-sonality!
 
 ## License
 
