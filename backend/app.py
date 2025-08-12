@@ -25,9 +25,8 @@ load_dotenv()
 MONGODB_URI = os.getenv("MONGODB_URI")
 MONGODB_DB = os.getenv("MONGODB_DB", "trip_agent")
 if not MONGODB_URI:
-    raise RuntimeError("请在 .env 文件中设置 MONGODB_URI 环境变量。")
+    raise RuntimeError("Please set the MONGODB_URI environment variable in your .env file")
 
-# 初始化 FastAPI 和 MongoDB 客户端
 app = FastAPI(
     title="Trip-sonality API",
     description="API for generating personalized travel itineraries using an AutoGen multi-agent system.",
@@ -53,17 +52,16 @@ conversations = db.get_collection("conversations")
 # "User's natural language query, including destination, days, preferences etc."
 # "User's possible existing itinerary (optional, JSON object)"
 class UserInput(BaseModel):
-    mbti: str = Field(..., description="用户的 MBTI 类型 (16 种之一)")
-    budget: Optional[int] = Field(None, description="用户的预算 (可选, 美元)")
-    query: str = Field(..., description="用户的自然语言查询，包含目的地、天数、偏好等信息")
-    current_itinerary: Optional[Dict[str, Any]] = Field(None, description="用户可能提供的现有行程 (可选, JSON 对象)")
+    mbti: str = Field(..., description="user's MBTI type ")
+    budget: Optional[int] = Field(None, description="User's budget ")
+    query: str = Field(..., description="user's natural language query, including destination, number of days, preferences, etc.")
+    current_itinerary: Optional[Dict[str, Any]] = Field(None, description="Existing itineraries that the user may provide (optional, JSON object)")
 
 # Define API response model - simplified to only include session_id and raw JSON data
 class ItineraryResponse(BaseModel):
     session_id: str
-    data: Any = Field(..., description="原始行程JSON数据")
+    data: Any = Field(..., description="Original itinerary JSON data")
 
-# Application startup - connect to MongoDB
 @app.on_event("startup")
 async def startup_db_client():
     try:
@@ -76,7 +74,6 @@ async def startup_db_client():
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    # Application shutdown - close MongoDB client
     print("Closing MongoDB connection...")
     mongo_client.close()
 
@@ -117,11 +114,11 @@ async def generate_plan(user_input: UserInput):
             status_code=500,
             detail=f"An internal error occurred during itinerary generation: {e}"
         )
-    # Store result in MongoDB
+
     record = {
         "session_id": session_id,
         "user_input": user_input.dict(),
-        "data": raw_data,  # 存储原始JSON数据
+        "data": raw_data,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc)
     }
@@ -131,7 +128,6 @@ async def generate_plan(user_input: UserInput):
     except Exception as e:
         print(f"Error saving record to MongoDB: {e}")
 
-    # Return response to frontend
     response_data = {
         "session_id": session_id,
         "data": raw_data 
@@ -140,7 +136,6 @@ async def generate_plan(user_input: UserInput):
 
 @app.get("/health", tags=["Health Check"])
 async def health_check():
-    # Simple health check endpoint
     return {"status": "ok"}
 
 # Local run (optional)

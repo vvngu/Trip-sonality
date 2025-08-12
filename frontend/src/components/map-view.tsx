@@ -1,4 +1,3 @@
-// src/components/map-view.tsx
 import React, { useState, useMemo } from "react";
 // @ts-ignore
 import {
@@ -53,9 +52,6 @@ const calculateCenter = (locations: LocationData[]): { lat: number; lng: number 
 };
 
 // Create a separate file called react-app-env.d.ts in the src directory with this content:
-// /// <reference types="react-scripts" />
-// declare module '@react-google-maps/api';
-
 export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations }) => {
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [selectedLoc, setSelectedLoc] = useState<ItineraryLocation | null>(
@@ -253,7 +249,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations })
                   {placeDetails.photos && placeDetails.photos.length > 0 && (
                     <div className="mt-2 mb-3 relative">
                       <div className="w-full h-36 rounded-md overflow-hidden bg-gray-100">
-                        {/* 添加 try-catch 和 onError 处理 */}
+                        {/* Add try-catch and onError handling*/}
                         {(() => {
                           try {
                             const photoUrl = placeDetails.photos[
@@ -270,7 +266,6 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations })
                                 } - Photo ${currentPhotoIndex + 1}`}
                                 className="w-full h-36 object-cover rounded-md"
                                 onError={(e) => {
-                                  // 如果图片加载失败，显示备用图片
                                   console.error("Photo failed to load:", e);
                                   e.currentTarget.src =
                                     "https://via.placeholder.com/600x400?text=No+Image+Available";
@@ -288,7 +283,7 @@ export const MapView: React.FC<MapViewProps> = ({ highlightedPlace, locations })
                         })()}
                       </div>
 
-                      {/* Photo Navigation - 仅在确实有多张照片时显示 */}
+                      {/* Photo Navigation */}
                       {placeDetails.photos &&
                         placeDetails.photos.length > 1 && (
                           <>

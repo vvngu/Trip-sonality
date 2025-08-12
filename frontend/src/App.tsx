@@ -2,14 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "./components/sidebar";
 import { MapView } from "./components/map-view";
 import { ChatHeader } from "./components/chat-header";
-// import Itinerary from "./components/itinerary";
 import Itinerary, {
   placeholderItinerary,
   ItineraryDay,
 } from "./components/itinerary";
 import Select, { SingleValue } from "react-select";
 import { FiShare2, FiCalendar } from "react-icons/fi";
-// import { FaSignInAlt } from "react-icons/fa";
 import WelcomePage from "./components/WelcomePage";
 import ShareModal from "./components/ShareModal";
 import SampleGuides from "./components/sampleGuides";

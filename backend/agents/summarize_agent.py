@@ -1,6 +1,6 @@
 from autogen_agentchat.agents import AssistantAgent
 from utils import load_prompt
-from config import client  # 提前统一管理 client 初始化
+from config import client
 
 summarize_agent = AssistantAgent(
     "summarize_agent",

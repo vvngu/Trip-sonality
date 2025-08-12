@@ -25,7 +25,7 @@ export const placeholderItinerary = [
   },
 ] as const;
 
-// 导出 ItineraryDay 类型，方便其他组件使用
+//ItineraryDay
 export type ItineraryDay = (typeof placeholderItinerary)[number];
 
 interface ItineraryProps {
